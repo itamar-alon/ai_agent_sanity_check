@@ -1,0 +1,3 @@
+npx playwright test tests/login.spec.ts --headed
+
+npx playwright test tests/arnona.spec.ts --headed
