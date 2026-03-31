@@ -1,3 +1,19 @@
 npx playwright test tests/login.spec.ts --headed
 
 npx playwright test tests/arnona.spec.ts --headed
+
+npx playwright test tests/parking.spec.ts --headed
+
+npx playwright test tests/education.spec.ts --headed
+
+npx playwright test tests/street.spec.ts --headed
+
+npx playwright test tests/meeting.spec.ts --headed
+
+npx playwright test tests/myInquiries.spec.ts --headed
+
+npx playwright test tests/newInquire.spec.ts --headed
+
+
+
+
