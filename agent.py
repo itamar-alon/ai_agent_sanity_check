@@ -49,9 +49,10 @@ def update_grafana(summary_message: str) -> str:
     if not all([grafana_url, grafana_user, grafana_token]):
         return "⚠️ Simulation: Missing Grafana details in .env."
 
-    # שימוש בנתיב InfluxDB המתאים לטקסט חופשי בגרפנה קלאוד
+    push_url = grafana_url.replace('prometheus', 'influx').replace('api/prom/push', 'api/v1/push/influx/write')
+    
+    # יצירת ה-Payload בפורמט InfluxDB Line Protocol
     payload = f'itamar_sanity_check,job=ai_agent value={status_value}'
-    push_url = grafana_url.replace('api/prom/push', 'api/v1/push/influx/write')
 
     try:
         response = requests.post(
@@ -70,14 +71,12 @@ def update_grafana(summary_message: str) -> str:
     except Exception as e:
         return f"Connection Failed: {str(e)}"
 
-# --- Execution ---
-
 callable_tools = {"run_playwright_test": run_playwright_test, "update_grafana": update_grafana}
 
 if __name__ == "__main__":
     print("--- AI Agent Orchestrator: Ultimate English Edition ---")
     
-    # הוראות קשוחות לסוכן - רק אנגלית!
+    # הוראות קשוחות לסוכן - רק אנגלית
     system_instruction = """
     You are a QA automation agent.
     Your exact tasks:
@@ -93,7 +92,7 @@ if __name__ == "__main__":
     
     CRITICAL RULES:
     - You MUST write the summary entirely in ENGLISH. Do not use Hebrew.
-    - If both tests passed successfully, your summary MUST contain the exact word 'Success'.
+    - If all tests passed successfully, your summary MUST contain the exact word 'Success'.
     """
 
     print("\n🔍 [DIAGNOSTIC] Asking Google which models your API key is allowed to use...")
@@ -147,7 +146,7 @@ if __name__ == "__main__":
     try:
         print("🤖 [AGENT] Task completed.")
         
-        # בלוק זה ירוץ במקרה שהספרייה לא מריצה פונקציות באופן אוטומטי
+        # לולאת הרצת הכלים של הסוכן
         while response and response.function_calls:
             for tool_call in response.function_calls:
                 tool_name = tool_call.name
