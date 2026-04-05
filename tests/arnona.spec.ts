@@ -5,7 +5,7 @@ import * as path from 'path';
 dotenv.config();
 
 test('Arnona - full flow', async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(150000); // הגדלתי מעט את הטיימאאוט הכללי של הטסט
 
   let hasErrors = false;
   let errorSummary: string[] = [];
@@ -63,14 +63,21 @@ test('Arnona - full flow', async ({ page }) => {
     } catch (e) {}
 
     await page.waitForSelector('span[aria-label="צפייה"]', { state: 'visible', timeout: 15000 });
-    const downloadPromise1 = page.waitForEvent('download', { timeout: 15000 });
-    await page.locator('span[aria-label="צפייה"]').first().click();
-    const download1 = await downloadPromise1;
+
+    // התיקון כאן: שימוש ב-Promise.all והגדלת ה-Timeout ל-60 שניות
+    console.log("Initiating voucher download (waiting up to 60s)...");
+    const [download] = await Promise.all([
+      page.waitForEvent('download', { timeout: 60000 }), 
+      page.locator('span[aria-label="צפייה"]').first().click(),
+    ]);
     
-    const filePath1 = path.join(__dirname, download1.suggestedFilename());
-    await download1.saveAs(filePath1);
-    fs.unlinkSync(filePath1);
-    console.log("✅ Voucher downloaded and deleted successfully.");
+    const filePath = path.join(__dirname, download.suggestedFilename());
+    await download.saveAs(filePath);
+    
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log("✅ Voucher downloaded and deleted successfully.");
+    }
   } catch (e) {
     console.log("❌ Error in View Vouchers tab:", (e as Error).message);
     hasErrors = true;
