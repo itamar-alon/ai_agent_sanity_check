@@ -18,6 +18,19 @@ test('Parking - full flow', async ({ page }) => {
   await page.locator('button[type="button"]:has-text("כניסה")').last().click();
   await page.waitForLoadState('networkidle');
 
+  // --- 🛑 טיפול חכם בפופ-אפ "לתשומת ליבך" 🛑 ---
+  console.log("🔍 Checking for informational popup...");
+  try {
+    const continueBtn = page.locator('button:has-text("המשך")').first();
+    await continueBtn.waitFor({ state: 'visible', timeout: 5000 });
+    await continueBtn.click();
+    console.log("✅ Popup dismissed successfully.");
+    await page.waitForLoadState('networkidle');
+  } catch (e) {
+    console.log("ℹ️ No popup appeared, continuing with the test.");
+  }
+  // ----------------------------------------------
+
   try {
     console.log("Checking tab: Unpaid Tickets...");
     await page.goto(`${process.env.BASE_URL}/parking/?tab=1#/parking/unpaid`);

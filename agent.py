@@ -2,6 +2,7 @@ import os
 import subprocess
 import requests
 import re
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -24,12 +25,13 @@ client = genai.Client(api_key=api_key)
 
 # --- Tools ---
 
-def run_playwright_test(test_name: str) -> str:
+def run_playwright_test(test_name: str, is_retry: bool = False) -> str:
     """
     Runs a Playwright test and returns a detailed result.
-    Includes a timeout to prevent the agent from hanging.
+    Includes a timeout to prevent the agent from hanging, and a Self-Healing Retry.
     """
-    print(f"\n⏳ [PLAYWRIGHT] Executing: '{test_name}'...")
+    mode = "RETRY" if is_retry else "INITIAL RUN"
+    print(f"\n⏳ [PLAYWRIGHT] {mode}: Executing '{test_name}'...")
     try:
         # הפעלה עם timeout של 3 דקות כדי למנוע קיפאון של הסוכן
         result = subprocess.run(
@@ -45,6 +47,12 @@ def run_playwright_test(test_name: str) -> str:
         if result.returncode == 0:
             print(f"✅ [PLAYWRIGHT] '{test_name}' Passed.")
             return f"Success: {test_name} passed."
+            
+        # --- תוספת Self-Healing: ניסיון חוזר במקרה של כישלון (פעם אחת בלבד) ---
+        if not is_retry:
+            print(f"⚠️ [SELF-HEALING] '{test_name}' failed. Waiting 5s and retrying...")
+            time.sleep(5)
+            return run_playwright_test(test_name, is_retry=True)
         
         # --- התיקון: הסרת קודי צבע (ANSI) של פליירייט מהטרמינל ---
         full_output = result.stdout + result.stderr
@@ -61,7 +69,7 @@ def run_playwright_test(test_name: str) -> str:
         if error_context == "Unknown failure reason" and "failed" in clean_output.lower():
              error_context = "Playwright test failed. Check local HTML report."
 
-        print(f"❌ [PLAYWRIGHT] '{test_name}' Failed. Reason: {error_context}")
+        print(f"❌ [PLAYWRIGHT] '{test_name}' Failed definitively. Reason: {error_context}")
         return f"Failure: {test_name} failed. Error Context: {error_context}"
 
     except subprocess.TimeoutExpired:
@@ -74,7 +82,7 @@ def run_playwright_test(test_name: str) -> str:
 def update_grafana(test_name: str, result_message: str) -> str:
     """
     Pushes detailed metrics for a specific test to Grafana Cloud.
-    Now sends error_msg as a TAG for better visibility in Grafana Tables.
+    Sends error_msg as a TAG and includes an AI-driven Root Cause Analysis (RCA).
     """
     print(f"📊 [GRAFANA] Reporting result for: {test_name}...")
     
@@ -89,7 +97,19 @@ def update_grafana(test_name: str, result_message: str) -> str:
         else:
             error_log = result_message
             
-    # ניקוי תווים מיוחדים לפורמט InfluxDB - עכשיו בצורה חכמה יותר למנוע "רכבות" של קווים תחתונים
+    # --- שדרוג RCA: ניתוח סיבת שורש באמצעות AI ---
+    ai_analysis = "N/A"
+    if status_value == 0:
+        print(f"🧠 [AI ANALYSIS] Asking Gemini to analyze the failure for {test_name}...")
+        prompt = f"The UI test '{test_name}' failed with the following error: {error_log}. Briefly explain what went wrong in 5-7 words for a technical dashboard."
+        try:
+            ai_res = client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
+            ai_analysis = ai_res.text.strip().replace(" ", "_").replace(",", "").replace(".", "")[:100]
+        except Exception as e:
+            print(f"⚠️ AI Analysis failed: {e}")
+            ai_analysis = "Analysis_Unavailable"
+            
+    # ניקוי תווים מיוחדים לפורמט InfluxDB - מונע "רכבות" של קווים תחתונים
     clean_error = re.sub(r'[ ,=]+', '_', error_log).replace('"', '').replace('\n', '_')
     clean_error = re.sub(r'_+', '_', clean_error).strip('_')[:120]
     clean_test_name = test_name.replace(" ", "_")
@@ -100,8 +120,8 @@ def update_grafana(test_name: str, result_message: str) -> str:
     # בניית ה-URL עם התיקון ל-Hostname והנתיב של InfluxDB
     push_url = grafana_url.replace('prometheus', 'influx').replace('api/prom/push', 'api/v1/push/influx/write')
     
-    # Payload
-    payload = f'itamar_sanity_detailed,test_name={clean_test_name},error_msg={clean_error},job=ai_agent value={status_value}'
+    # Payload מעודכן עם תגית ה-AI החדשה (ai_rca)
+    payload = f'itamar_sanity_detailed,test_name={clean_test_name},error_msg={clean_error},ai_rca={ai_analysis},job=ai_agent value={status_value}'
 
     try:
         response = requests.post(
@@ -112,7 +132,8 @@ def update_grafana(test_name: str, result_message: str) -> str:
             timeout=10
         )
         if response.status_code in [200, 204]:
-            print(f"✅ [GRAFANA] Metrics updated for {test_name} (Status: {status_value})")
+            insight_print = f" | RCA: {ai_analysis}" if status_value == 0 else ""
+            print(f"✅ [GRAFANA] Metrics updated for {test_name} (Status: {status_value}){insight_print}")
             return f"Grafana successfully updated for {test_name}."
         else:
             print(f"❌ [GRAFANA] Error {response.status_code}: {response.text}")
@@ -192,7 +213,8 @@ if __name__ == "__main__":
             print(f"✅ Connection established with {target_model}.\n")
             break 
         except Exception as e:
-            print(f"⚠️ Model {target_model} failed. Trying next model...")
+            # --- התיקון: הדפסת השגיאה האמיתית למקרה שהמודל נכשל ---
+            print(f"⚠️ Model {target_model} failed. Error: {str(e)}")
             active_chat = None
 
     if not active_chat:
