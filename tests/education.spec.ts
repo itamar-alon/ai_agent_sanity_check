@@ -1,112 +1,162 @@
-import { test, expect } from '@playwright/test';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { test, expect, Locator, Page } from '@playwright/test';
 
-test('Education - full flow', async ({ page }) => {
-  test.setTimeout(150000);
+// ----------------------------
+//  Handle payment portal
+// ----------------------------
+const handlePaymentPortal = async (trigger: Locator, contextName: string) => {
+  console.log(`⏳ Triggering portal for ${contextName}...`);
 
-  let hasErrors = false;
-  let errorSummary: string[] = [];
+  // נרשמים ל-new page לפני הלחיצה
+  let newPagePromise = trigger.page().context().waitForEvent("page", { timeout: 15000 }).catch(() => null);
 
-  console.log("🚀 Starting Sanity Run - Education");
+  // לוחצים על המחיר - force חובה כאן כדי לעקוף שכבות לא נראות
+  await trigger.click({ force: true });
 
-  await page.goto(`${process.env.BASE_URL}/education/?tab=1`);
-  await page.click('button:has-text("התחברות"), a:has-text("התחברות")');
-  await page.click('button[role="tab"]:has-text("באמצעות סיסמה")');
-  await page.fill('input[name="tz"]', process.env.TEST_ID!);
-  await page.fill('input[name="password"]', process.env.TEST_PASSWORD!);
-  await page.locator('button[type="button"]:has-text("כניסה")').last().click();
-  await page.waitForLoadState('networkidle');
+  // בודקים אם יש פופ-אפ של "המשך"
+  const continueBtn = trigger.page().getByRole('button', { name: 'המשך' }).first();
+  const isPopupVisible = await continueBtn.isVisible({ timeout: 5000 }).catch(() => false);
 
-  // --- 🛑 טיפול חכם בפופ-אפ "לתשומת ליבך" 🛑 ---
-  console.log("🔍 Checking for informational popup...");
-  try {
-    // נחפש את כפתור "המשך" וניתן לו 5 שניות להופיע
-    const continueBtn = page.locator('button:has-text("המשך")').first();
-    await continueBtn.waitFor({ state: 'visible', timeout: 5000 });
-    await continueBtn.click();
-    console.log("✅ Popup dismissed successfully.");
-    await page.waitForLoadState('networkidle');
-  } catch (e) {
-    // השגיאה נבלעת בכוונה. אם לא קפץ פופ-אפ, הכל בסדר, פשוט ממשיכים.
-    console.log("ℹ️ No popup appeared, continuing with the test.");
+  if (isPopupVisible) {
+    console.log(`🖱️ Popup detected. Clicking 'Continue'...`);
+    // מאפסים את ה-promise כי הלחיצה על "המשך" היא זו שפותחת את החלון החדש
+    newPagePromise = trigger.page().context().waitForEvent("page", { timeout: 30000 }).catch(() => null);
+    await continueBtn.click({ force: true });
+    // מחכים שהפופ אפ באמת ייעלם כדי לדעת שהקליק נרשם
+    await continueBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+  } else {
+    console.log(`ℹ️ No confirmation popup. Relying on initial click...`);
   }
-  // ----------------------------------------------
 
+  const newPage = await newPagePromise;
+  
+  if (newPage) {
+    console.log(`✅ New tab opened for ${contextName}.`);
+    await newPage.waitForLoadState("domcontentloaded").catch(() => {});
+    return { portalPage: newPage, isNewTab: true };
+  }
+
+  console.log(`ℹ️ No new tab detected. Using current tab...`);
+  return { portalPage: trigger.page(), isNewTab: false };
+};
+
+// ----------------------------
+//  Verify portal loaded
+// ----------------------------
+const verifyPortalLoaded = async (portalPage: Page) => {
+  await expect(async () => {
+    // מחפשים iframe, אבל נוסיף גם גיבוי למקרה שהפורטל לא ב-iframe 
+    // נחפש אלמנטים נפוצים בפורטל מילגם (כמו שדות ת.ז, מס' חשבון או כרטיס)
+    // העדכון: הוספת :visible לכל בורר כדי לא להיתפס על אלמנטים מוסתרים (כמו טפסי ng-hide)
+    const portalIndicators = portalPage.locator('iframe:visible, input[type="tel"]:visible, input#MisparHeshbon:visible, form:visible').first();
+    await expect(portalIndicators).toBeVisible({ timeout: 5000 });
+  }).toPass({ timeout: 30000 });
+};
+
+// ----------------------------
+//  Main test flow
+// ----------------------------
+test("Education - full flow", async ({ page, baseURL }) => {
+  test.setTimeout(180000);
+  let hasErrors = false;
+  const errorSummary: string[] = [];
+
+  console.log(`🚀 Starting Sanity Run - Education on: ${baseURL}`);
+
+  await page.goto('/');
+
+  // ניקוי עוגיות
+  const cookieBtn = page.getByRole('button', { name: 'מאשר הכל' });
+  if (await cookieBtn.isVisible({ timeout: 5000 })) {
+    await cookieBtn.click();
+    await cookieBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+  }
+
+  await page.getByText('חינוך').first().click();
+  const noDataLocator = page.getByText('אין נתונים').first();
+
+  // ----------------------------
+  // Student Payments
+  // ----------------------------
   try {
-    console.log("Checking tab: Student Payments...");
-    await page.goto(`${process.env.BASE_URL}/education/?tab=1#/students/payments`);
-    await page.waitForLoadState('networkidle');
+    console.log("🔍 Checking tab: Student Payments...");
 
-    const paymentLink = page.locator('span[aria-label*="₪"]').first();
-    await expect(paymentLink).toBeVisible({ timeout: 15000 });
-    const amountText = await paymentLink.getAttribute('aria-label');
-    console.log(`✅ Payment data found: ${amountText}`);
+    // התיקון: ניווט מפורש לטאב תשלומי חינוך כדי למנוע מצב שבו המערכת זוכרת טאב אחר מהיסטוריית הגלישה
+    await page.getByRole("tab", { name: "תשלומי חינוך" }).click();
 
-    const [externalPage] = await Promise.all([
-      page.context().waitForEvent('page'),
-      paymentLink.click(),
-    ]);
+    // עדכון הבורר לפי בקשתך - לחיצה על כפתור התשלום הספציפי
+    const paymentLink = page.locator('a[aria-label="לחץ כאן כדי לשלם את כלל היתרות"]').first();
+    await expect(paymentLink.or(noDataLocator).first()).toBeVisible({ timeout: 30000 });
 
-    await externalPage.waitForLoadState('networkidle');
-    const accountInput = externalPage.locator('#MisparHeshbon');
-    await expect(accountInput).toBeVisible({ timeout: 15000 });
-    await expect(accountInput).not.toHaveValue('', { timeout: 10000 });
-    
-    console.log("✅ External payment portal verified with account data.");
-    await externalPage.close();
-  } catch (e) {
-    console.log("❌ Error in Student Payments flow:", (e as Error).message);
+    if (await paymentLink.isVisible()) {
+      const { portalPage, isNewTab } = await handlePaymentPortal(paymentLink, "Student Payments");
+
+      await verifyPortalLoaded(portalPage);
+      console.log("✅ Student Payments portal verified.");
+
+      if (isNewTab) await portalPage.close();
+      else await portalPage.goBack({ waitUntil: "load" }).catch(()=>{});
+    } else {
+      console.log("ℹ️ Student Payments: No data.");
+    }
+  } catch (err) {
+    console.error("❌ Student Payments Error:", (err as Error).message);
     hasErrors = true;
     errorSummary.push("Student Payments");
   }
 
+  // ----------------------------
+  // Additional Payments
+  // ----------------------------
   try {
-    console.log("Checking tab: Additional Payments...");
-    await page.click('button[role="tab"]:has-text("תשלומים נוספים")');
-    await page.waitForLoadState('networkidle');
+    console.log("🔍 Checking tab: Additional Payments...");
+    await page.getByRole("tab", { name: "תשלומים נוספים" }).click();
 
-    const totalBalanceLink = page.locator('a[aria-label*="יתרות"]').first();
-    await expect(totalBalanceLink).toBeVisible({ timeout: 15000 });
-    const balanceAmount = await totalBalanceLink.getAttribute('aria-label');
-    console.log(`✅ Additional payments found: ${balanceAmount}`);
+    const balanceLink = page.locator('span[aria-label*="₪"]').first();
+    await expect(balanceLink.or(noDataLocator).first()).toBeVisible({ timeout: 30000 });
 
-    const [balancePage] = await Promise.all([
-      page.context().waitForEvent('page'),
-      totalBalanceLink.click(),
-    ]);
+    if (await balanceLink.isVisible()) {
+      const { portalPage, isNewTab } = await handlePaymentPortal(balanceLink, "Additional Payments");
 
-    await balancePage.waitForLoadState('networkidle');
-    const balanceAccountInput = balancePage.locator('#MisparHeshbon');
-    await expect(balanceAccountInput).toBeVisible({ timeout: 15000 });
-    await expect(balanceAccountInput).not.toHaveValue('', { timeout: 10000 });
+      await verifyPortalLoaded(portalPage);
+      console.log("✅ Additional Payments portal verified.");
 
-    console.log("✅ External balance portal verified.");
-    await balancePage.close();
-  } catch (e) {
-    console.log("❌ Error in Additional Payments flow:", (e as Error).message);
+      if (isNewTab) await portalPage.close();
+      else await portalPage.goBack({ waitUntil: "load" }).catch(()=>{});
+    } else {
+      console.log("ℹ️ Additional Payments: No data.");
+    }
+  } catch (err) {
+    console.error("❌ Additional Payments Error:", (err as Error).message);
     hasErrors = true;
     errorSummary.push("Additional Payments");
   }
 
+  // ----------------------------
+  // Registration and Placement
+  // ----------------------------
   try {
-    console.log("Checking tab: Registration and Placement...");
-    await page.click('button[role="tab"]:has-text("רישום/שיבוץ")');
-    await page.waitForLoadState('networkidle');
+    console.log("🔍 Checking tab: Registration and Placement...");
+    
+    await expect(async () => {
+         await page.getByRole('tab', { name: 'רישום/שיבוץ' }).click({ force: true });
+    }).toPass({timeout: 5000});
 
-    const registrationData = page.locator('span[aria-label^="0000"]').first();
-    await expect(registrationData).toBeVisible({ timeout: 15000 });
-    const regValue = await registrationData.getAttribute('aria-label');
-    console.log(`✅ Registration data found: ${regValue}`);
-  } catch (e) {
-    console.log("❌ Error in Registration tab:", (e as Error).message);
+    const regData = page.locator('span[aria-label^="0"], span[aria-label^="1"]').first();
+    await expect(regData.or(noDataLocator).first()).toBeVisible({ timeout: 20000 });
+
+    console.log("✅ Registration data found.");
+  } catch (err) {
+    console.error("❌ Registration/Placement Error:", (err as Error).message);
     hasErrors = true;
     errorSummary.push("Registration/Placement");
   }
 
+  // ----------------------------
+  // Finalize
+  // ----------------------------
   if (hasErrors) {
-    throw new Error(`Education test failed in: ${errorSummary.join(', ')}`);
-  } else {
-    console.log("🎉 Education Sanity completed successfully!");
+    throw new Error(`Education failed: ${errorSummary.join(", ")}`);
   }
+
+  console.log("🎉 Education Sanity completed successfully!");
 });

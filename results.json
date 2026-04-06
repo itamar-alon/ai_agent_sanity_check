@@ -1,0 +1,781 @@
+{
+  "config": {
+    "rootDir": "C:/Users/user/פרויקטים/sanity check",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/user/פרויקטים/sanity check/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/user/פרויקטים/sanity check",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "tests\\arnona.spec.ts",
+      "file": "tests/arnona.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Arnona - full flow",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 41602,
+                  "error": {
+                    "message": "Error: Test failed in the following tabs: Receipts",
+                    "stack": "Error: Test failed in the following tabs: Receipts\n    at C:\\Users\\user\\פרויקטים\\sanity check\\tests\\arnona.spec.ts:102:11",
+                    "location": {
+                      "file": "C:\\Users\\user\\פרויקטים\\sanity check\\tests\\arnona.spec.ts",
+                      "column": 11,
+                      "line": 102
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 100 |\u001b[39m\n \u001b[90m 101 |\u001b[39m   \u001b[36mif\u001b[39m (hasErrors) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 102 |\u001b[39m     \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Test failed in the following tabs: ${errorSummary.join(', ')}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 103 |\u001b[39m   } \u001b[36melse\u001b[39m {\n \u001b[90m 104 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m\"🎉 All tabs verified successfully!\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 105 |\u001b[39m   }\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\user\\פרויקטים\\sanity check\\tests\\arnona.spec.ts",
+                        "column": 11,
+                        "line": 102
+                      },
+                      "message": "Error: Test failed in the following tabs: Receipts\n\n  100 |\n  101 |   if (hasErrors) {\n> 102 |     throw new Error(`Test failed in the following tabs: ${errorSummary.join(', ')}`);\n      |           ^\n  103 |   } else {\n  104 |     console.log(\"🎉 All tabs verified successfully!\");\n  105 |   }\n    at C:\\Users\\user\\פרויקטים\\sanity check\\tests\\arnona.spec.ts:102:11"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Arnona\n"
+                    },
+                    {
+                      "text": "Checking tab: Assets...\n"
+                    },
+                    {
+                      "text": "Checking tab: Account Status...\n"
+                    },
+                    {
+                      "text": "Checking tab: View Vouchers...\n"
+                    },
+                    {
+                      "text": "Initiating voucher download (waiting up to 60s)...\n"
+                    },
+                    {
+                      "text": "✅ Voucher downloaded and deleted successfully.\n"
+                    },
+                    {
+                      "text": "Checking tab: Payment Receipts...\n"
+                    },
+                    {
+                      "text": "❌ Error in Payment Receipts tab: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('span[aria-label*=\"/\"]').first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('span[aria-label*=\"/\"]').first()\u001b[22m\n\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-06T10:06:08.575Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\user\\פרויקטים\\sanity check\\test-results\\tests-arnona-Arnona---full-flow\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\user\\פרויקטים\\sanity check\\tests\\arnona.spec.ts",
+                    "column": 11,
+                    "line": 102
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "be9a1f69e1745cf7a086-ba0f31fc55c9d5a9df95",
+          "file": "tests/arnona.spec.ts",
+          "line": 7,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "tests\\education.spec.ts",
+      "file": "tests/education.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Education - full flow",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "timedOut",
+                  "duration": 150040,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 150000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 150000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 150000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "C:\\Users\\user\\פרויקטים\\sanity check\\tests\\education.spec.ts",
+                        "column": 11,
+                        "line": 108
+                      },
+                      "message": "Error: Education test failed in: Additional Payments, Registration/Placement\n\n  106 |\n  107 |   if (hasErrors) {\n> 108 |     throw new Error(`Education test failed in: ${errorSummary.join(', ')}`);\n      |           ^\n  109 |   } else {\n  110 |     console.log(\"🎉 Education Sanity completed successfully!\");\n  111 |   }\n    at C:\\Users\\user\\פרויקטים\\sanity check\\tests\\education.spec.ts:108:11"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Education\n"
+                    },
+                    {
+                      "text": "🔍 Checking for informational popup...\n"
+                    },
+                    {
+                      "text": "ℹ️ No popup appeared, continuing with the test.\n"
+                    },
+                    {
+                      "text": "Checking tab: Student Payments...\n"
+                    },
+                    {
+                      "text": "✅ Payment data found: ₪ 70.00\n"
+                    },
+                    {
+                      "text": "✅ External payment portal verified with account data.\n"
+                    },
+                    {
+                      "text": "Checking tab: Additional Payments...\n"
+                    },
+                    {
+                      "text": "✅ Additional payments found: לחץ כאן כדי לשלם את כלל היתרות\n"
+                    },
+                    {
+                      "text": "❌ Error in Additional Payments flow: browserContext.waitForEvent: Test timeout of 150000ms exceeded.\n"
+                    },
+                    {
+                      "text": "Checking tab: Registration and Placement...\n"
+                    },
+                    {
+                      "text": "❌ Error in Registration tab: page.click: Target page, context or browser has been closed\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-06T10:06:08.547Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\user\\פרויקטים\\sanity check\\test-results\\tests-education-Education---full-flow\\error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "fdc62013a7fdb8ef4888-bc2d0a5a770ff5a7ea15",
+          "file": "tests/education.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "tests\\login.spec.ts",
+      "file": "tests/login.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Login",
+          "file": "tests/login.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "successful login with valid credentials",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 9498,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-06T10:06:08.612Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6b6dc33e290e5a0a43b1-d2c5a475050637324031",
+              "file": "tests/login.spec.ts",
+              "line": 7,
+              "column": 7
+            },
+            {
+              "title": "failed login with wrong password",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 6107,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-06T10:06:18.345Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6b6dc33e290e5a0a43b1-b896d1c273e0ba2ce3d8",
+              "file": "tests/login.spec.ts",
+              "line": 27,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "tests\\meeting.spec.ts",
+      "file": "tests/meeting.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Appointments - full login flow and dynamic booking with Mock",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 250000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 33283,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Appointments\n"
+                    },
+                    {
+                      "text": "🔍 Checking for informational popup...\n"
+                    },
+                    {
+                      "text": "ℹ️ No popup appeared, continuing with the test.\n"
+                    },
+                    {
+                      "text": "Navigating to Appointments wizard (Attempt 1/3)...\n"
+                    },
+                    {
+                      "text": "Selecting option for Step 1...\n"
+                    },
+                    {
+                      "text": "Selecting option for Step 2...\n"
+                    },
+                    {
+                      "text": "Selecting option for Step 3...\n"
+                    },
+                    {
+                      "text": "Handling dynamic dates and times...\n"
+                    },
+                    {
+                      "text": "🔍 Found 15 available dates in current month.\n"
+                    },
+                    {
+                      "text": "🗓️ Clicking date #1 of 15...\n"
+                    },
+                    {
+                      "text": "✅ Found 6 visible time slots! Selecting the first one...\n"
+                    },
+                    {
+                      "text": "Submitting appointment request...\n"
+                    },
+                    {
+                      "text": "🛡️ INITIATING MOCK: Intercepted real appointment request!\n"
+                    },
+                    {
+                      "text": "✅ MOCK SUCCESS: Injected fake confirmation response.\n"
+                    },
+                    {
+                      "text": "Verifying success message...\n"
+                    },
+                    {
+                      "text": "🎉 Appointment flow completed successfully (Mocked).\n"
+                    },
+                    {
+                      "text": "✅ Sanity completed!\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-06T10:06:08.628Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ab90613278701e292085-2775c546af15da9e0990",
+          "file": "tests/meeting.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "tests\\myInquiries.spec.ts",
+      "file": "tests/myInquiries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "My Inquiries - data visibility check",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 9152,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - My Inquiries\n"
+                    },
+                    {
+                      "text": "Navigating to My Inquiries...\n"
+                    },
+                    {
+                      "text": "Verifying that inquiries data is loaded...\n"
+                    },
+                    {
+                      "text": "✅ Found inquiry record: ITS-2604-00049\n"
+                    },
+                    {
+                      "text": "✅ Total inquiries found on page: 71\n"
+                    },
+                    {
+                      "text": "🎉 My Inquiries verification completed successfully!\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-06T10:06:24.479Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "360f635f53defed6c06f-22f2c1eb46bfb10e79af",
+          "file": "tests/myInquiries.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "tests\\newInquire.spec.ts",
+      "file": "tests/newInquire.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Create All Inquiries - Single Session with Reset Logic",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 45282,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Integrated Sanity Run - Single Session\n"
+                    },
+                    {
+                      "text": "\n--- Processing: Field Treatment (106) ---\n"
+                    },
+                    {
+                      "text": "Waiting for form to stabilize...\n"
+                    },
+                    {
+                      "text": "Filling Subject (106)...\n"
+                    },
+                    {
+                      "text": "Filling Street...\n"
+                    },
+                    {
+                      "text": "Filling House Number...\n"
+                    },
+                    {
+                      "text": "Filling Details...\n"
+                    },
+                    {
+                      "text": "Submitting...\n"
+                    },
+                    {
+                      "text": "🛡️ MOCK ACTIVATED: Intercepting submission\n"
+                    },
+                    {
+                      "text": "Validating success...\n"
+                    },
+                    {
+                      "text": "✅ Field Treatment (106) completed successfully (Mocked).\n"
+                    },
+                    {
+                      "text": "Closing success popup...\n"
+                    },
+                    {
+                      "text": "\n--- Processing: Information Request ---\n"
+                    },
+                    {
+                      "text": "Waiting for form to stabilize...\n"
+                    },
+                    {
+                      "text": "Filling Unit...\n"
+                    },
+                    {
+                      "text": "Waiting for Subject list to load...\n"
+                    },
+                    {
+                      "text": "Filling Subject...\n"
+                    },
+                    {
+                      "text": "Filling Street...\n"
+                    },
+                    {
+                      "text": "Filling House Number...\n"
+                    },
+                    {
+                      "text": "Filling Details...\n"
+                    },
+                    {
+                      "text": "Submitting...\n"
+                    },
+                    {
+                      "text": "🛡️ MOCK ACTIVATED: Intercepting submission\n"
+                    },
+                    {
+                      "text": "Validating success...\n"
+                    },
+                    {
+                      "text": "✅ Information Request completed successfully (Mocked).\n"
+                    },
+                    {
+                      "text": "Closing success popup...\n"
+                    },
+                    {
+                      "text": "\n🏁 Integrated Sanity Run Finished.\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-06T10:06:33.659Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "befba20e0ce036ae8af6-8322c0afbc8c7a1c5585",
+          "file": "tests/newInquire.spec.ts",
+          "line": 16,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "tests\\parking.spec.ts",
+      "file": "tests/parking.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Parking - full flow",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "failed",
+                  "duration": 66621,
+                  "error": {
+                    "message": "Error: Parking test failed in: Unpaid Tickets, Appeal Button",
+                    "stack": "Error: Parking test failed in: Unpaid Tickets, Appeal Button\n    at C:\\Users\\user\\פרויקטים\\sanity check\\tests\\parking.spec.ts:106:11",
+                    "location": {
+                      "file": "C:\\Users\\user\\פרויקטים\\sanity check\\tests\\parking.spec.ts",
+                      "column": 11,
+                      "line": 106
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 104 |\u001b[39m\n \u001b[90m 105 |\u001b[39m   \u001b[36mif\u001b[39m (hasErrors) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 106 |\u001b[39m     \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Parking test failed in: ${errorSummary.join(', ')}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 107 |\u001b[39m   } \u001b[36melse\u001b[39m {\n \u001b[90m 108 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m\"🎉 Parking Sanity completed successfully!\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 109 |\u001b[39m   }\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\user\\פרויקטים\\sanity check\\tests\\parking.spec.ts",
+                        "column": 11,
+                        "line": 106
+                      },
+                      "message": "Error: Parking test failed in: Unpaid Tickets, Appeal Button\n\n  104 |\n  105 |   if (hasErrors) {\n> 106 |     throw new Error(`Parking test failed in: ${errorSummary.join(', ')}`);\n      |           ^\n  107 |   } else {\n  108 |     console.log(\"🎉 Parking Sanity completed successfully!\");\n  109 |   }\n    at C:\\Users\\user\\פרויקטים\\sanity check\\tests\\parking.spec.ts:106:11"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Parking\n"
+                    },
+                    {
+                      "text": "🔍 Checking for informational popup...\n"
+                    },
+                    {
+                      "text": "ℹ️ No popup appeared, continuing with the test.\n"
+                    },
+                    {
+                      "text": "Checking tab: Unpaid Tickets...\n"
+                    },
+                    {
+                      "text": "❌ Error in Unpaid Tickets flow: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div[role=\"button\"].toggle-list-item').first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div[role=\"button\"].toggle-list-item').first()\u001b[22m\n\n"
+                    },
+                    {
+                      "text": "Checking Appeal functionality...\n"
+                    },
+                    {
+                      "text": "❌ Appeal button not found: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button:has-text(\"להגשת ערעור\")').first()\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"להגשת ערעור\")').first()\u001b[22m\n\n"
+                    },
+                    {
+                      "text": "Checking tab: Paid Tickets...\n"
+                    },
+                    {
+                      "text": "✅ Paid tickets history and images verified.\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-06T10:06:42.186Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\user\\פרויקטים\\sanity check\\test-results\\tests-parking-Parking---full-flow\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\user\\פרויקטים\\sanity check\\tests\\parking.spec.ts",
+                    "column": 11,
+                    "line": 106
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "6298d1a3f5d08e6677b6-eda69f0c12579515a0c1",
+          "file": "tests/parking.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "tests\\street.spec.ts",
+      "file": "tests/street.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Street Info - dynamic check",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4570,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Street Info\n"
+                    },
+                    {
+                      "text": "Selecting a street from the dropdown...\n"
+                    },
+                    {
+                      "text": "Verifying primary data existence...\n"
+                    },
+                    {
+                      "text": "✅ Data found: הוצאת פסולת או גזם\n"
+                    },
+                    {
+                      "text": "ℹ️ No Plus button present for this street, skipping detailed check.\n"
+                    },
+                    {
+                      "text": "🎉 Street Info verification completed!\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-04-06T10:06:51.878Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "728a857d817ffff6d028-f02cd0799487d8708bda",
+          "file": "tests/street.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-04-06T10:06:06.670Z",
+    "duration": 152231.354,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}
