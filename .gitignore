@@ -1,0 +1,10 @@
+.vscode
+venv
+.env
+playwright
+test-results
+.last-run.json
+user.json
+.auth
+selffile.txt
+node_modules
