@@ -1,6 +1,4 @@
 import { test, expect } from '@playwright/test';
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 const INQUIRY_MOCK_RESPONSE = {
   Status: "200",
@@ -13,24 +11,14 @@ const inquiryTypes = [
   { name: 'Information Request', buttonText: 'בירור או בקשת מידע', is106: false }
 ];
 
-test('Create All Inquiries - Single Session with Reset Logic', async ({ page }) => {
+test('Create All Inquiries - Single Session with Reset Logic', async ({ page, baseURL }) => {
   test.setTimeout(240000);
-  console.log("🚀 Starting Integrated Sanity Run - Single Session");
+  let hasErrors = false;
+  let errorSummary: string[] = [];
 
-  // שלב 1: התחברות חד-פעמית
-  await page.goto(`${process.env.BASE_URL}`);
-  
-  // חיסול עוגיות אם מופיע
-  await page.locator('button[aria-label="מאשר הכל"]').first().click({ timeout: 3000 }).catch(() => {});
+  console.log(`🚀 Starting Integrated Sanity Run - New Inquiries on: ${baseURL}`);
 
-  await page.click('button:has-text("כניסה"), a:has-text("כניסה")');
-  await page.click('button[role="tab"]:has-text("באמצעות סיסמה")');
-  await page.fill('input[name="tz"]', process.env.TEST_ID!);
-  await page.fill('input[name="password"]', process.env.TEST_PASSWORD!);
-  await page.locator('button[type="button"]:has-text("כניסה")').last().click();
-  await page.waitForLoadState('networkidle');
-
-  // הגדרת המוק - הכתובת המדויקת שחולצה מה-Network
+  // --- הגדרת המוק ---
   await page.route('**/Umbraco/Api/NewCallApi/SendNewCall*', async route => {
     console.log(`🛡️ MOCK ACTIVATED: Intercepting submission`);
     await route.fulfill({
@@ -40,14 +28,34 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page }) 
     });
   });
 
-  // שלב 2: ריצה על סוגי הפניות באותה כרטיסייה
+  // --- ריצה על סוגי הפניות באותה כרטיסייה ---
   for (const type of inquiryTypes) {
     console.log(`\n--- Processing: ${type.name} ---`);
     
     try {
-      // ניווט לדף יצירת פניה בתחילת כל סיבוב כדי לאפס את הטופס
-      await page.goto(`${process.env.BASE_URL}/my-inquiries#/create-incident`);
-      await page.waitForLoadState('networkidle');
+      // חזרה לדף הבית בתחילת כל סיבוב לאיפוס הסטייט והטופס
+      await page.goto('/');
+      await page.waitForLoadState('domcontentloaded');
+
+      // 🍪 Cookie Slayer (נבדק בכל סיבוב למקרה שצץ מחדש)
+      const cookieBtn = page.getByRole('button', { name: 'מאשר הכל' });
+      if (await cookieBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await cookieBtn.click();
+        await cookieBtn.waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {});
+      }
+
+      // 🛑 פופ-אפ הודעות גלובלי
+      const globalContinueBtn = page.getByRole('button', { name: 'המשך' }).first();
+      if (await globalContinueBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await globalContinueBtn.click({ force: true });
+      }
+
+      // --- ניווט טבעי מה-UI ---
+      console.log("Navigating to Create Inquiry via UI...");
+      // Regex שתופס את רוב הניסוחים לאריח של פתיחת פניה/מוקד
+      const newInquiryTile = page.getByText(/פניה חדשה|יצירת פניה|פתיחת קריאה|מוקד 106/).first();
+      await newInquiryTile.click();
+      await page.waitForLoadState('networkidle').catch(() => {});
       await page.waitForTimeout(2000);
 
       // לחיצה על סוג הפניה בפופ-אפ
@@ -61,7 +69,6 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page }) 
       // --- מילוי דרופדאון יחידה / נושא ---
       if (type.is106) {
         console.log("Filling Subject (106)...");
-        // שימוש ב-:visible כדי להימנע מאלמנטים מוסתרים
         const subjectInput = page.locator('input[role="combobox"]:visible').first();
         await subjectInput.waitFor({ state: 'visible' });
         await subjectInput.click({ force: true });
@@ -79,13 +86,11 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page }) 
         await page.waitForTimeout(500);
         await page.keyboard.press('Enter');
         
-        // המתנה לטעינת רשימת הנושאים בעקבות בחירת היחידה
         console.log("Waiting for Subject list to load...");
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('networkidle').catch(() => {});
         await page.waitForTimeout(3000); 
 
         console.log("Filling Subject...");
-        // שימוש ב-:visible ולקיחת האלמנט השני הנראה
         const subjectInput = page.locator('input[role="combobox"]:visible').nth(1);
         await subjectInput.waitFor({ state: 'visible' });
         await subjectInput.click({ force: true });
@@ -97,14 +102,14 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page }) 
 
       await page.waitForTimeout(1000);
 
-      // --- מילוי מספר דוח (שימוש במזהה המדויק מה-HTML) ---
+      // --- מילוי מספר דוח ---
       const reportField = page.locator('input[name="reportNumber"]');
       if (await reportField.isVisible()) {
         console.log("Filling report number...");
         await reportField.fill("12345678");
       }
 
-      // --- מילוי רחוב (דרופדאון - אחרון ברשימת ה-combobox) ---
+      // --- מילוי רחוב ---
       console.log("Filling Street...");
       const streetInput = page.locator('input[role="combobox"][aria-autocomplete="list"]:visible').last();
       await streetInput.scrollIntoViewIfNeeded();
@@ -115,12 +120,12 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page }) 
       await streetOption.waitFor({ state: 'visible' });
       await streetOption.click({ force: true });
 
-      // --- מילוי מספר בית (שימוש במזהה המדויק מה-HTML) ---
+      // --- מילוי מספר בית ---
       console.log("Filling House Number...");
       const houseInput = page.locator('input[name="houseNumber"]');
       await houseInput.fill("12");
 
-      // --- מילוי תיאור פנייה (מינימום 15 תווים) ---
+      // --- מילוי תיאור פנייה ---
       console.log("Filling Details...");
       const detailsInput = page.locator('textarea[name="details"]');
       await detailsInput.fill("בדיקת סניטי אוטומטית - תיאור פנייה מפורט מעל חמש עשרה תווים");
@@ -137,7 +142,6 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page }) 
       await expect(successPopup).toBeVisible({ timeout: 20000 });
       console.log(`✅ ${type.name} completed successfully (Mocked).`);
 
-      // לחיצה על כפתור סגירה כדי לנקות את המסך לפני הפנייה הבאה
       console.log("Closing success popup...");
       const closeBtn = page.locator('button:has-text("סגירה"), button:has-text("אישור")').first();
       if (await closeBtn.isVisible()) {
@@ -147,10 +151,14 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page }) 
 
     } catch (e) {
       console.log(`❌ Error in ${type.name}:`, (e as Error).message);
-      // אם קרס, ננסה לחזור למסך הבית כדי לא לתקוע את הבדיקה הבאה
-      await page.goto(`${process.env.BASE_URL}`);
+      hasErrors = true;
+      errorSummary.push(type.name);
     }
   }
   
-  console.log("\n🏁 Integrated Sanity Run Finished.");
+  if (hasErrors) {
+    throw new Error(`Create Inquiries test failed in: ${errorSummary.join(', ')}`);
+  } else {
+    console.log("\n🏁 Integrated Sanity Run Finished Successfully.");
+  }
 });

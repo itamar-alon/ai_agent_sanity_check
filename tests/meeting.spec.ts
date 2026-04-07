@@ -1,37 +1,32 @@
 import { test, expect } from '@playwright/test';
-import * as dotenv from 'dotenv';
-dotenv.config();
 
-test('Appointments - full login flow and dynamic booking with Mock', async ({ page }) => {
+test('Appointments - full flow with natural navigation and Mock', async ({ page, baseURL }) => {
   test.setTimeout(250000);
   let hasErrors = false;
   let errorSummary: string[] = [];
 
-  console.log("🚀 Starting Sanity Run - Appointments");
+  console.log(`🚀 Starting Sanity Run - Appointments on: ${baseURL}`);
 
-  // שלב 1: התחברות
-  await page.goto(`${process.env.BASE_URL}`);
-  await page.click('button:has-text("כניסה"), a:has-text("כניסה")');
-  await page.click('button[role="tab"]:has-text("באמצעות סיסמה")');
-  await page.fill('input[name="tz"]', process.env.TEST_ID!);
-  await page.fill('input[name="password"]', process.env.TEST_PASSWORD!);
-  await page.locator('button[type="button"]:has-text("כניסה")').last().click();
-  await page.waitForLoadState('networkidle');
+  // --- שלב 1: כניסה לדף הבית וניקוי חסמים ---
+  // (המשתמש כבר מחובר אוטומטית בזכות ה-Global Setup)
+  await page.goto('/');
 
-  // --- 🛑 טיפול חכם בפופ-אפ "לתשומת ליבך" 🛑 ---
-  console.log("🔍 Checking for informational popup...");
-  try {
-    const continueBtn = page.locator('button:has-text("המשך")').first();
-    await continueBtn.waitFor({ state: 'visible', timeout: 5000 });
-    await continueBtn.click();
-    console.log("✅ Popup dismissed successfully.");
-    await page.waitForLoadState('networkidle');
-  } catch (e) {
-    console.log("ℹ️ No popup appeared, continuing with the test.");
+  // 🍪 Cookie Slayer
+  const cookieBtn = page.getByRole('button', { name: 'מאשר הכל' });
+  if (await cookieBtn.isVisible({ timeout: 5000 })) {
+    await cookieBtn.click();
+    await cookieBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+    console.log("✅ Cookie banner cleared.");
   }
-  // ----------------------------------------------
 
-  // שלב 2: הגדרת ה-Mock
+  // 🛑 טיפול חכם בפופ-אפ הודעות ("לתשומת ליבך") אם קיים בדף הבית
+  const globalContinueBtn = page.getByRole('button', { name: 'המשך' }).first();
+  if (await globalContinueBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await globalContinueBtn.click({ force: true });
+    console.log("✅ Initial informational popup cleared.");
+  }
+
+  // --- שלב 2: הגדרת ה-Mock ---
   await page.route('**/SetAppointment*', async route => {
     console.log("🛡️ INITIATING MOCK: Intercepted real appointment request!");
     await route.fulfill({
@@ -53,13 +48,21 @@ test('Appointments - full login flow and dynamic booking with Mock', async ({ pa
   });
 
   try {
-    // --- התיקון הגדול: מנגנון רענון דף חכם למקרה שאין תוצאות ---
+    // --- שלב 3: מנגנון רענון חכם וניווט מה-UI ---
     let wizardReady = false;
 
     for (let wizardAttempt = 1; wizardAttempt <= 3; wizardAttempt++) {
       console.log(`Navigating to Appointments wizard (Attempt ${wizardAttempt}/3)...`);
-      await page.goto(`${process.env.BASE_URL}/פגישות/`);
-      await page.waitForLoadState('networkidle');
+      
+      // מתחילים תמיד מדף הבית כדי להבטיח ניווט נקי
+      await page.goto('/'); 
+      await page.waitForLoadState('domcontentloaded');
+      
+      // התיקון לאחידות: לחיצה על האריח מה-UI במקום ניווט ישיר
+      // (השתמשתי ב-Regex כדי לתפוס גם "פגישות", "זימון תורים", "זימון פגישות")
+      const appointmentsTile = page.getByText(/פגישות|זימון תורים/).first();
+      await appointmentsTile.click();
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       let errorInSteps = false;
 
@@ -68,11 +71,11 @@ test('Appointments - full login flow and dynamic booking with Mock', async ({ pa
         await page.waitForTimeout(2000); // ממתינים לתשובה מהשרת
         
         // בדיקה: האם קפץ "אין תוצאות חיפוש מתאימות"?
-        const noResultsMsg = page.locator('text="אין תוצאות חיפוש מתאימות"').first();
+        const noResultsMsg = page.getByText('אין תוצאות חיפוש מתאימות').first();
         if (await noResultsMsg.isVisible()) {
-          console.log(`⚠️ 'No matching results' found at Step ${step}. Refreshing the page...`);
+          console.log(`⚠️ 'No matching results' found at Step ${step}. Refreshing the flow...`);
           errorInSteps = true;
-          break; // שובר את לולאת השלבים וקופץ חזרה לרענון הדף (wizardAttempt)
+          break; // שובר את לולאת השלבים וקופץ חזרה לרענון מההתחלה (wizardAttempt)
         }
 
         try {
@@ -81,15 +84,15 @@ test('Appointments - full login flow and dynamic booking with Mock', async ({ pa
           
           await expect(optionToClick).toBeVisible({ timeout: 10000 });
           await optionToClick.click({ force: true });
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('networkidle').catch(() => {});
         } catch (err) {
-          console.log(`⚠️ Step ${step} failed to load options properly. Refreshing the page...`);
+          console.log(`⚠️ Step ${step} failed to load options properly. Refreshing the flow...`);
           errorInSteps = true;
           break;
         }
       }
 
-      // אם סיימנו את הלולאה (1-3) בלי שגיאות רענון, אנחנו מוכנים להמשיך
+      // אם סיימנו את הלולאה (1-3) בלי שגיאות, אנחנו מוכנים להמשיך
       if (!errorInSteps) {
         wizardReady = true;
         break; 
@@ -101,7 +104,7 @@ test('Appointments - full login flow and dynamic booking with Mock', async ({ pa
     }
     // ------------------------------------------------------------------
 
-    // שלב 4: בחירת תאריך ושעה דינמית 
+    // --- שלב 4: בחירת תאריך ושעה דינמית --- 
     console.log("Handling dynamic dates and times...");
     let appointmentFound = false;
     let monthsChecked = 0;
@@ -143,13 +146,13 @@ test('Appointments - full login flow and dynamic booking with Mock', async ({ pa
         } else {
           console.log(`ℹ️ Date #${i + 1} has no times available.`);
           
-          const backBtn = page.locator('text="חזור"').first();
+          const backBtn = page.getByText('חזור').first();
           if (await backBtn.isVisible({ timeout: 3000 })) {
              console.log("🔙 Clicking 'Back' to return to the calendar view...");
              await backBtn.click({ force: true });
              await page.waitForTimeout(2000); 
           } else {
-             const step4Header = page.locator('text="מועדים פנויים לפגישה"').first();
+             const step4Header = page.getByText('מועדים פנויים לפגישה').first();
              if (await step4Header.isVisible()) {
                 console.log("🔙 Clicking Step 4 Header to reopen calendar...");
                 await step4Header.click({ force: true });
@@ -184,13 +187,13 @@ test('Appointments - full login flow and dynamic booking with Mock', async ({ pa
       throw new Error("Could not find any available appointments in the next 3 months.");
     }
 
-    // שלב 5: שליחת הבקשה (Mock)
+    // --- שלב 5: שליחת הבקשה (Mock) ---
     console.log("Submitting appointment request...");
     const submitBtn = page.locator('button.MuiButton-containedWarning:visible', { hasText: /^זימון פגישה$/ }).first();
     await expect(submitBtn).toBeVisible({ timeout: 15000 });
     await submitBtn.click();
 
-    // שלב 6: אימות הצלחה
+    // --- שלב 6: אימות הצלחה ---
     console.log("Verifying success message...");
     const successMessage = page.locator('h4.text-center.mt-4.font-bold:visible:has-text("פגישתך נקבעה בהצלחה")');
     await expect(successMessage).toBeVisible({ timeout: 20000 });
