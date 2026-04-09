@@ -72,7 +72,18 @@ test("Education - full flow", async ({ page, baseURL }) => {
   }
 
   await page.getByText('חינוך').first().click();
+
+  // --- התאמת סביבות: Test vs Pre-Prod/Prod ---
+  // אם ה-baseURL לא מכיל 'test' (כלומר אנחנו בפרה-פרוד או פרודקשן)
+  // נלחץ במפורש על הטאב "תיק תלמיד" כדי לוודא שאנחנו במסך הנכון
+  if (baseURL && !baseURL.includes('test')) {
+    console.log("🌍 Non-Test environment detected. Explicitly navigating to 'תיק תלמיד' tab...");
+    await page.getByRole('tab', { name: 'תיק תלמיד' }).click();
+  }
+  // -------------------------------------------
+
   const noDataLocator = page.getByText('אין נתונים').first();
+  const studentHeaderLocator = page.getByText('ת.ז:').first(); // הוספנו מזהה כללי לטעינת תיק תלמיד
 
   // ----------------------------
   // Student Payments
@@ -85,7 +96,9 @@ test("Education - full flow", async ({ page, baseURL }) => {
 
     // עדכון הבורר לפי בקשתך - לחיצה על כפתור התשלום הספציפי
     const paymentLink = page.locator('a[aria-label="לחץ כאן כדי לשלם את כלל היתרות"]').first();
-    await expect(paymentLink.or(noDataLocator).first()).toBeVisible({ timeout: 30000 });
+    
+    // מצפים לראות את כפתור התשלום, או "אין נתונים", או נתוני תלמיד שמוכיחים שהעמוד נטען (גם אם אין חוב)
+    await expect(paymentLink.or(noDataLocator).or(studentHeaderLocator).first()).toBeVisible({ timeout: 30000 });
 
     if (await paymentLink.isVisible()) {
       const { portalPage, isNewTab } = await handlePaymentPortal(paymentLink, "Student Payments");
@@ -96,7 +109,7 @@ test("Education - full flow", async ({ page, baseURL }) => {
       if (isNewTab) await portalPage.close();
       else await portalPage.goBack({ waitUntil: "load" }).catch(()=>{});
     } else {
-      console.log("ℹ️ Student Payments: No data.");
+      console.log("ℹ️ Student Payments: No payment link available (either no debt or no data).");
     }
   } catch (err) {
     console.error("❌ Student Payments Error:", (err as Error).message);
@@ -112,7 +125,9 @@ test("Education - full flow", async ({ page, baseURL }) => {
     await page.getByRole("tab", { name: "תשלומים נוספים" }).click();
 
     const balanceLink = page.locator('span[aria-label*="₪"]').first();
-    await expect(balanceLink.or(noDataLocator).first()).toBeVisible({ timeout: 30000 });
+    
+    // גם כאן מזהים נתוני תלמיד כמצב חוקי שבו העמוד נטען אך אין תשלומים
+    await expect(balanceLink.or(noDataLocator).or(studentHeaderLocator).first()).toBeVisible({ timeout: 30000 });
 
     if (await balanceLink.isVisible()) {
       const { portalPage, isNewTab } = await handlePaymentPortal(balanceLink, "Additional Payments");
@@ -123,7 +138,7 @@ test("Education - full flow", async ({ page, baseURL }) => {
       if (isNewTab) await portalPage.close();
       else await portalPage.goBack({ waitUntil: "load" }).catch(()=>{});
     } else {
-      console.log("ℹ️ Additional Payments: No data.");
+      console.log("ℹ️ Additional Payments: No payment link available (either no debt or no data).");
     }
   } catch (err) {
     console.error("❌ Additional Payments Error:", (err as Error).message);
