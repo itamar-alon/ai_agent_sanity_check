@@ -2,9 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-/**
- * טעינת ה-env מהנתיב המלא
- */
+
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 export default defineConfig({
@@ -14,7 +12,6 @@ export default defineConfig({
   workers: 2,
   reporter: 'html',
 
-  /* הגדרות כלליות לכל הפרויקטים */
   use: {
     baseURL: process.env.BASE_URL || process.env.URL_TEST,
     actionTimeout: 15000,
@@ -25,19 +22,19 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'setup', // השם שאתה קורא לו בטרמינל
-      testMatch: '**/*.setup.ts', // יחפש כל קובץ שמסתיים ב-setup.ts בתוך תיקיית tests
+      name: 'setup', 
+      testMatch: '**/*.setup.ts', 
       use: { 
-        storageState: undefined // חשוב! שה-setup יתחיל נקי בלי לחפש עוגיות ישנות
+        storageState: undefined 
       },
     },
     {
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json', // כאן הטסטים הרגילים ימשכו את העוגיות
+        storageState: 'playwright/.auth/user.json', 
       },
-      dependencies: ['setup'], // מבטיח שה-setup ירוץ תמיד לפני chromium
+      dependencies: ['setup'], 
     },
   ]
 });
