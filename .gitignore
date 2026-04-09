@@ -10,4 +10,4 @@ selffile.txt
 node_modules/
 *.webm
 *.png
-playwright-report/
+playwright-report
