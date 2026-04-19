@@ -3,13 +3,18 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+const envPath = path.resolve(__dirname, '.env');
+const result = dotenv.config({ path: envPath });
+
+if (result.error) {
+  console.log(`⚠️ Warning: Could not find .env file at ${envPath}`);
+}
 
 export default defineConfig({
   testDir: './tests',
   timeout: 60000,
   fullyParallel: true,
-  workers: 2,
+  workers: 1,
   reporter: 'html',
 
   use: {

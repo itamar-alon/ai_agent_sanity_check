@@ -7,11 +7,9 @@ test('Appointments - full flow with natural navigation and Mock', async ({ page,
 
   console.log(`🚀 Starting Sanity Run - Appointments on: ${baseURL}`);
 
-  // --- שלב 1: כניסה לדף הבית וניקוי חסמים ---
-  // (המשתמש כבר מחובר אוטומטית בזכות ה-Global Setup)
+
   await page.goto('/');
 
-  // 🍪 Cookie Slayer
   const cookieBtn = page.getByRole('button', { name: 'מאשר הכל' });
   if (await cookieBtn.isVisible({ timeout: 5000 })) {
     await cookieBtn.click();
@@ -19,14 +17,12 @@ test('Appointments - full flow with natural navigation and Mock', async ({ page,
     console.log("✅ Cookie banner cleared.");
   }
 
-  // 🛑 טיפול חכם בפופ-אפ הודעות ("לתשומת ליבך") אם קיים בדף הבית
   const globalContinueBtn = page.getByRole('button', { name: 'המשך' }).first();
   if (await globalContinueBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
     await globalContinueBtn.click({ force: true });
     console.log("✅ Initial informational popup cleared.");
   }
 
-  // --- שלב 2: הגדרת ה-Mock ---
   await page.route('**/SetAppointment*', async route => {
     console.log("🛡️ INITIATING MOCK: Intercepted real appointment request!");
     await route.fulfill({
@@ -48,18 +44,14 @@ test('Appointments - full flow with natural navigation and Mock', async ({ page,
   });
 
   try {
-    // --- שלב 3: מנגנון רענון חכם וניווט מה-UI ---
     let wizardReady = false;
 
     for (let wizardAttempt = 1; wizardAttempt <= 3; wizardAttempt++) {
       console.log(`Navigating to Appointments wizard (Attempt ${wizardAttempt}/3)...`);
       
-      // מתחילים תמיד מדף הבית כדי להבטיח ניווט נקי
       await page.goto('/'); 
       await page.waitForLoadState('domcontentloaded');
       
-      // התיקון לאחידות: לחיצה על האריח מה-UI במקום ניווט ישיר
-      // (השתמשתי ב-Regex כדי לתפוס גם "פגישות", "זימון תורים", "זימון פגישות")
       const appointmentsTile = page.getByText(/פגישות|זימון תורים/).first();
       await appointmentsTile.click();
       await page.waitForLoadState('networkidle').catch(() => {});
@@ -68,14 +60,13 @@ test('Appointments - full flow with natural navigation and Mock', async ({ page,
 
       for (let step = 1; step <= 3; step++) {
         console.log(`Selecting option for Step ${step}...`);
-        await page.waitForTimeout(2000); // ממתינים לתשובה מהשרת
+        await page.waitForTimeout(2000); 
         
-        // בדיקה: האם קפץ "אין תוצאות חיפוש מתאימות"?
         const noResultsMsg = page.getByText('אין תוצאות חיפוש מתאימות').first();
         if (await noResultsMsg.isVisible()) {
           console.log(`⚠️ 'No matching results' found at Step ${step}. Refreshing the flow...`);
           errorInSteps = true;
-          break; // שובר את לולאת השלבים וקופץ חזרה לרענון מההתחלה (wizardAttempt)
+          break; 
         }
 
         try {
@@ -92,7 +83,6 @@ test('Appointments - full flow with natural navigation and Mock', async ({ page,
         }
       }
 
-      // אם סיימנו את הלולאה (1-3) בלי שגיאות, אנחנו מוכנים להמשיך
       if (!errorInSteps) {
         wizardReady = true;
         break; 
@@ -102,9 +92,7 @@ test('Appointments - full flow with natural navigation and Mock', async ({ page,
     if (!wizardReady) {
       throw new Error("Failed to load appointment wizard options after 3 reloads. API might be down.");
     }
-    // ------------------------------------------------------------------
 
-    // --- שלב 4: בחירת תאריך ושעה דינמית --- 
     console.log("Handling dynamic dates and times...");
     let appointmentFound = false;
     let monthsChecked = 0;
@@ -187,13 +175,11 @@ test('Appointments - full flow with natural navigation and Mock', async ({ page,
       throw new Error("Could not find any available appointments in the next 3 months.");
     }
 
-    // --- שלב 5: שליחת הבקשה (Mock) ---
     console.log("Submitting appointment request...");
     const submitBtn = page.locator('button.MuiButton-containedWarning:visible', { hasText: /^זימון פגישה$/ }).first();
     await expect(submitBtn).toBeVisible({ timeout: 15000 });
     await submitBtn.click();
 
-    // --- שלב 6: אימות הצלחה ---
     console.log("Verifying success message...");
     const successMessage = page.locator('h4.text-center.mt-4.font-bold:visible:has-text("פגישתך נקבעה בהצלחה")');
     await expect(successMessage).toBeVisible({ timeout: 20000 });

@@ -10,3 +10,5 @@ print("Available Models:")
 for model in client.models.list():
     if "flash" in model.name.lower():
         print(f"- {model.name}")
+
+

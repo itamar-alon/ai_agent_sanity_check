@@ -18,7 +18,6 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page, ba
 
   console.log(`🚀 Starting Integrated Sanity Run - New Inquiries on: ${baseURL}`);
 
-  // --- הגדרת המוק ---
   await page.route('**/Umbraco/Api/NewCallApi/SendNewCall*', async route => {
     console.log(`🛡️ MOCK ACTIVATED: Intercepting submission`);
     await route.fulfill({
@@ -28,37 +27,31 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page, ba
     });
   });
 
-  // --- ריצה על סוגי הפניות באותה כרטיסייה ---
   for (const type of inquiryTypes) {
     console.log(`\n--- Processing: ${type.name} ---`);
     
     try {
-      // חזרה לדף הבית בתחילת כל סיבוב לאיפוס הסטייט והטופס
       await page.goto('/');
       await page.waitForLoadState('domcontentloaded');
 
-      // 🍪 Cookie Slayer (נבדק בכל סיבוב למקרה שצץ מחדש)
       const cookieBtn = page.getByRole('button', { name: 'מאשר הכל' });
       if (await cookieBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await cookieBtn.click();
         await cookieBtn.waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {});
       }
 
-      // 🛑 פופ-אפ הודעות גלובלי
       const globalContinueBtn = page.getByRole('button', { name: 'המשך' }).first();
       if (await globalContinueBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await globalContinueBtn.click({ force: true });
       }
 
-      // --- ניווט טבעי מה-UI ---
+
       console.log("Navigating to Create Inquiry via UI...");
-      // Regex שתופס את רוב הניסוחים לאריח של פתיחת פניה/מוקד
       const newInquiryTile = page.getByText(/פניה חדשה|יצירת פניה|פתיחת קריאה|מוקד 106/).first();
       await newInquiryTile.click();
       await page.waitForLoadState('networkidle').catch(() => {});
       await page.waitForTimeout(2000);
 
-      // לחיצה על סוג הפניה בפופ-אפ
       const optionBtn = page.locator(`button:has-text("${type.buttonText}"), div[role="button"]:has-text("${type.buttonText}")`).first();
       await expect(optionBtn).toBeVisible({ timeout: 15000 });
       await optionBtn.click();
@@ -66,7 +59,6 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page, ba
       console.log("Waiting for form to stabilize...");
       await page.waitForTimeout(3000);
 
-      // --- מילוי דרופדאון יחידה / נושא ---
       if (type.is106) {
         console.log("Filling Subject (106)...");
         const subjectInput = page.locator('input[role="combobox"]:visible').first();
@@ -102,14 +94,12 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page, ba
 
       await page.waitForTimeout(1000);
 
-      // --- מילוי מספר דוח ---
       const reportField = page.locator('input[name="reportNumber"]');
       if (await reportField.isVisible()) {
         console.log("Filling report number...");
         await reportField.fill("12345678");
       }
 
-      // --- מילוי רחוב ---
       console.log("Filling Street...");
       const streetInput = page.locator('input[role="combobox"][aria-autocomplete="list"]:visible').last();
       await streetInput.scrollIntoViewIfNeeded();
@@ -120,23 +110,23 @@ test('Create All Inquiries - Single Session with Reset Logic', async ({ page, ba
       await streetOption.waitFor({ state: 'visible' });
       await streetOption.click({ force: true });
 
-      // --- מילוי מספר בית ---
+ 
       console.log("Filling House Number...");
       const houseInput = page.locator('input[name="houseNumber"]');
       await houseInput.fill("12");
 
-      // --- מילוי תיאור פנייה ---
+ 
       console.log("Filling Details...");
       const detailsInput = page.locator('textarea[name="details"]');
       await detailsInput.fill("בדיקת סניטי אוטומטית - תיאור פנייה מפורט מעל חמש עשרה תווים");
 
-      // --- שליחה ---
+ 
       console.log("Submitting...");
       const sendBtn = page.locator('button:has-text("שליחה")');
       await expect(sendBtn).toBeEnabled();
       await sendBtn.click({ force: true });
 
-      // --- אימות הצלחה וסגירת הפופ-אפ ---
+
       console.log("Validating success...");
       const successPopup = page.locator('text=בהצלחה').first();
       await expect(successPopup).toBeVisible({ timeout: 20000 });

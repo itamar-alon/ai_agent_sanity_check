@@ -1,27 +1,20 @@
 import { test, expect, Locator, Page } from '@playwright/test';
 
-// ----------------------------
-//  Handle payment portal
-// ----------------------------
+
 const handlePaymentPortal = async (trigger: Locator, contextName: string) => {
   console.log(`⏳ Triggering portal for ${contextName}...`);
 
-  // נרשמים ל-new page לפני הלחיצה
   let newPagePromise = trigger.page().context().waitForEvent("page", { timeout: 15000 }).catch(() => null);
 
-  // לוחצים על המחיר - force חובה כאן כדי לעקוף שכבות לא נראות
   await trigger.click({ force: true });
 
-  // בודקים אם יש פופ-אפ של "המשך"
   const continueBtn = trigger.page().getByRole('button', { name: 'המשך' }).first();
   const isPopupVisible = await continueBtn.isVisible({ timeout: 5000 }).catch(() => false);
 
   if (isPopupVisible) {
     console.log(`🖱️ Popup detected. Clicking 'Continue'...`);
-    // מאפסים את ה-promise כי הלחיצה על "המשך" היא זו שפותחת את החלון החדש
     newPagePromise = trigger.page().context().waitForEvent("page", { timeout: 30000 }).catch(() => null);
     await continueBtn.click({ force: true });
-    // מחכים שהפופ אפ באמת ייעלם כדי לדעת שהקליק נרשם
     await continueBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
   } else {
     console.log(`ℹ️ No confirmation popup. Relying on initial click...`);
@@ -44,9 +37,6 @@ const handlePaymentPortal = async (trigger: Locator, contextName: string) => {
 // ----------------------------
 const verifyPortalLoaded = async (portalPage: Page) => {
   await expect(async () => {
-    // מחפשים iframe, אבל נוסיף גם גיבוי למקרה שהפורטל לא ב-iframe 
-    // נחפש אלמנטים נפוצים בפורטל מילגם (כמו שדות ת.ז, מס' חשבון או כרטיס)
-    // העדכון: הוספת :visible לכל בורר כדי לא להיתפס על אלמנטים מוסתרים (כמו טפסי ng-hide)
     const portalIndicators = portalPage.locator('iframe:visible, input[type="tel"]:visible, input#MisparHeshbon:visible, form:visible').first();
     await expect(portalIndicators).toBeVisible({ timeout: 5000 });
   }).toPass({ timeout: 30000 });
@@ -64,7 +54,6 @@ test("Education - full flow", async ({ page, baseURL }) => {
 
   await page.goto('/');
 
-  // ניקוי עוגיות
   const cookieBtn = page.getByRole('button', { name: 'מאשר הכל' });
   if (await cookieBtn.isVisible({ timeout: 5000 })) {
     await cookieBtn.click();
@@ -73,17 +62,13 @@ test("Education - full flow", async ({ page, baseURL }) => {
 
   await page.getByText('חינוך').first().click();
 
-  // --- התאמת סביבות: Test vs Pre-Prod/Prod ---
-  // אם ה-baseURL לא מכיל 'test' (כלומר אנחנו בפרה-פרוד או פרודקשן)
-  // נלחץ במפורש על הטאב "תיק תלמיד" כדי לוודא שאנחנו במסך הנכון
   if (baseURL && !baseURL.includes('test')) {
     console.log("🌍 Non-Test environment detected. Explicitly navigating to 'תיק תלמיד' tab...");
     await page.getByRole('tab', { name: 'תיק תלמיד' }).click();
   }
-  // -------------------------------------------
 
   const noDataLocator = page.getByText('אין נתונים').first();
-  const studentHeaderLocator = page.getByText('ת.ז:').first(); // הוספנו מזהה כללי לטעינת תיק תלמיד
+  const studentHeaderLocator = page.getByText('ת.ז:').first(); 
 
   // ----------------------------
   // Student Payments
@@ -91,13 +76,10 @@ test("Education - full flow", async ({ page, baseURL }) => {
   try {
     console.log("🔍 Checking tab: Student Payments...");
 
-    // התיקון: ניווט מפורש לטאב תשלומי חינוך כדי למנוע מצב שבו המערכת זוכרת טאב אחר מהיסטוריית הגלישה
     await page.getByRole("tab", { name: "תשלומי חינוך" }).click();
 
-    // עדכון הבורר לפי בקשתך - לחיצה על כפתור התשלום הספציפי
     const paymentLink = page.locator('a[aria-label="לחץ כאן כדי לשלם את כלל היתרות"]').first();
     
-    // מצפים לראות את כפתור התשלום, או "אין נתונים", או נתוני תלמיד שמוכיחים שהעמוד נטען (גם אם אין חוב)
     await expect(paymentLink.or(noDataLocator).or(studentHeaderLocator).first()).toBeVisible({ timeout: 30000 });
 
     if (await paymentLink.isVisible()) {
@@ -126,7 +108,6 @@ test("Education - full flow", async ({ page, baseURL }) => {
 
     const balanceLink = page.locator('span[aria-label*="₪"]').first();
     
-    // גם כאן מזהים נתוני תלמיד כמצב חוקי שבו העמוד נטען אך אין תשלומים
     await expect(balanceLink.or(noDataLocator).or(studentHeaderLocator).first()).toBeVisible({ timeout: 30000 });
 
     if (await balanceLink.isVisible()) {

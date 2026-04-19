@@ -10,28 +10,23 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
 
   console.log(`🚀 Starting Sanity Run - Arnona on: ${baseURL}`);
 
-  // 1. ניווט לעמוד הארנונה
   await page.goto('/arnona/');
   
   console.log("⏳ Waiting for data or 'No Data' message...");
 
-  // הגדרת שני הלוקטורים האפשריים
   const dataLocator = page.locator('span.truncate').first();
   const noDataLocator = page.getByText('אין נתונים');
 
   try {
-    // ממתינים עד שאחד מהם יופיע (משתמשים ב-or)
     await expect(dataLocator.or(noDataLocator)).toBeVisible({ timeout: 30000 });
     console.log("✅ Page state determined (Data exists or 'No Data' visible).");
   } catch (e) {
     throw new Error("❌ Timeout: Neither data nor 'No Data' message appeared.");
   }
 
-  // --- בדיקה 1: טאב נכסים ---
   try {
     console.log("🔍 Checking tab: Assets...");
     
-    // בודקים מה מופיע כרגע
     if (await noDataLocator.isVisible()) {
       console.log("ℹ️ Assets: No data found for this user (Valid state).");
     } else {
@@ -47,7 +42,6 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
     errorSummary.push("Assets");
   }
 
-  // --- בדיקה 2: טאב מצב חשבון ---
   try {
     console.log("🔍 Checking tab: Account Status...");
     await page.click('a:has-text("מצב חשבון"), button:has-text("מצב חשבון")');
@@ -55,7 +49,6 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
     const currencyLocator = page.locator('[aria-label*="₪"]').first();
     const noAccountData = page.getByText('אין נתונים');
 
-    // מחכים לאחד משניהם
     await expect(currencyLocator.or(noAccountData)).toBeVisible({ timeout: 20000 });
 
     if (await noAccountData.isVisible()) {
@@ -69,7 +62,6 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
     errorSummary.push("Account Status");
   }
 
-  // --- בדיקה 3: צפייה בשוברים ---
   try {
     console.log("🔍 Checking tab: View Vouchers...");
     await page.click('a:has-text("צפיה בשוברים"), button:has-text("צפיה בשוברים")');
@@ -108,18 +100,22 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
     errorSummary.push("Vouchers");
   }
 
-  // --- בדיקה 4: קבלות בגין תשלום ---
   try {
     console.log("🔍 Checking tab: Payment Receipts...");
     await page.click('a:has-text("קבלות בגין תשלום"), button:has-text("קבלות בגין תשלום")');
     
+    const skeletonLoader = page.locator('.MuiSkeleton-root, .skeleton, .loading-state').first();
+    await skeletonLoader.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+
     const receiptDate = page.locator('span[aria-label*="/"]').first();
-    const noReceipts = page.getByText('אין נתונים');
+    
+    const noDataMessages = page.locator(':text("אין נתונים"), :text("לא נמצאו תוצאות")').first();
 
-    await expect(receiptDate.or(noReceipts)).toBeVisible({ timeout: 20000 });
+    await expect(receiptDate.or(noDataMessages)).toBeVisible({ timeout: 20000 });
 
-    if (await noReceipts.isVisible()) {
-      console.log("ℹ️ Receipts: No payment receipts found (Valid state).");
+    if (await noDataMessages.isVisible()) {
+      const foundText = await noDataMessages.innerText();
+      console.log(`ℹ️ Receipts: Interface loaded but "${foundText.trim()}" (Valid state).`);
     } else {
       console.log("✅ Receipts data verified.");
     }
