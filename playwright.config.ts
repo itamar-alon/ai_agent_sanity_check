@@ -23,6 +23,7 @@ export default defineConfig({
     navigationTimeout: 30000,
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    trace: 'retain-on-failure',
   },
 
   projects: [
