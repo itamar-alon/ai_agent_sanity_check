@@ -11,3 +11,5 @@ node_modules/
 *.webm
 *.png
 playwright-report
+*.bat
+package-lock.json
