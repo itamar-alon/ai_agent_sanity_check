@@ -55,7 +55,6 @@ npx playwright install
 Configure Environment Variables:
 Create a .env file in the root directory with your API keys, Grafana credentials, and target URLs:
 
-קטע קוד
 # Google Gemini API
 GOOGLE_API_KEY=your_gemini_api_key
 
