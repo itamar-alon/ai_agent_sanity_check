@@ -1,83 +1,87 @@
-🤖 AI QA Agent – Smart Sanity Orchestrator
-An intelligent QA automation agent that runs, analyzes, and reports Playwright sanity tests across multiple environments. By leveraging Google Gemini AI, the agent performs automated Root Cause Analysis (RCA), transforming complex failure logs into actionable insights.
+# 🤖 AI QA Agent – Smart Sanity Orchestrator
 
-🚀 Key Features
-Intelligent Execution: Automatically orchestrates Playwright test suites across test, pre-prod, and prod environments.
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
+[![Playwright](https://img.shields.io/badge/Framework-Playwright-critical.svg)](https://playwright.dev/)
+[![Gemini AI](https://img.shields.io/badge/AI-Google_Gemini-blueviolet.svg)](https://ai.google.dev/)
+[![Grafana](https://img.shields.io/badge/Monitoring-Grafana-orange.svg)](https://grafana.com/)
 
-AI-Powered RCA: Uses LLM analysis to parse JSON reports and tracebacks, providing concise explanations for failures.
+An intelligent QA automation agent that runs, analyzes, and reports Playwright sanity tests across multiple environments using Google's Gemini AI.
 
-Smart Flaky Test Handling: Detects environmental flakiness (timeouts, network issues) and triggers automated retries before marking a test as failed.
+## ✨ Key Features
 
-Full Observability: Real-time integration with Grafana/InfluxDB, pushing metrics, AI insights, and video evidence paths to a centralized dashboard.
+- **Intelligent Execution**: Automatically discovers and runs Playwright tests using `npx playwright test`.
+- **AI-Powered Root Cause Analysis (RCA)**: Uses Gemini to analyze Playwright JSON reports and error logs, providing concise root causes.
+- **Flaky Test Handling**: Detects potentially flaky tests (timeouts, network issues, elements not found) and automatically retries them before marking them as failed.
+- **Grafana/InfluxDB Integration**: Pushes test metrics, AI RCA, severity levels, scope, and video evidence paths directly to a Grafana dashboard.
+- **Multi-Environment Support**: Seamlessly tests across `test`, `pre-prod`, and `prod` environments.
+- **Cross-Environment Summary**: Evaluates the health of the entire pipeline and flags suspected overarching infrastructure or authentication issues.
 
-Cross-Environment Summary: Evaluates global pipeline health to identify if issues are isolated or indicate infrastructure-wide failures.
+## 🛠️ Prerequisites
 
-Secure Secret Management: Utilizes .env files and environment-aware configuration to keep sensitive API keys and credentials secure.
+- **Python 3.9+**
+- **Node.js & npm** (with Playwright configured)
+- **Google Gemini API Key**
+- **Grafana / InfluxDB Instance**
 
-🛠️ Tech Stack
-Language: Python 3.9+
+---
 
-Automation: Playwright (Node.js engine)
+## 📂 Project Structure
 
-AI Engine: Google Gemini Flash
-
-Database: InfluxDB (Metrics storage)
-
-Visualization: Grafana Dashboards
-
-📂 Project Structure
-Plaintext
+```text
 ├── tests/                # Playwright test suites (TS/JS)
 ├── agent.py              # Main AI Orchestration logic
 ├── model.py              # Gemini AI integration & prompt engineering
 ├── .env                  # Private credentials (Git Ignored)
-├── .env_example          # Template for environment variables
 ├── package.json          # Node.js dependencies & Playwright config
 ├── playwright.config.ts  # Playwright environment setup
 ├── requirements.txt      # Python dependencies
 └── README.md
-⚙️ Installation & Setup
-1. Clone the Repository
+🚀 Setup & Installation
+Clone the repository:
+
 Bash
-git clone https://github.com/itamar-alon/ai_agent_sanity_check.git
+git clone [https://github.com/itamar-alon/ai_agent_sanity_check.git](https://github.com/itamar-alon/ai_agent_sanity_check.git)
 cd ai_agent_sanity_check
-2. Install Dependencies
-Python side:
+Install Python dependencies:
 
 Bash
 pip install -r requirements.txt
-Node.js side:
+Install Node dependencies:
+Ensure you have Playwright set up in your project directory.
 
 Bash
 npm install
 npx playwright install
-3. Configuration (.env)
-Create a .env file in the root directory. Use .env_example as a template:
+Configure Environment Variables:
+Create a .env file in the root directory with your API keys, Grafana credentials, and target URLs:
 
 קטע קוד
-# AI Configuration
-GOOGLE_API_KEY=your_gemini_key_here
+# Google Gemini API
+GOOGLE_API_KEY=your_gemini_api_key
 
-# Monitoring
-GRAFANA_URL=your_endpoint_here
-GRAFANA_TOKEN=your_token_here
+# Grafana / InfluxDB Configuration
+GRAFANA_URL=[https://your-grafana-instance.com/api/prom/push](https://your-grafana-instance.com/api/prom/push)
+GRAFANA_USER=your_grafana_user
+GRAFANA_TOKEN=your_grafana_token
 
-# Target Environments
-URL_TEST=https://test.example.com
-URL_PROD=https://prod.example.com
-🏃‍♂️ How to Run
-Execute the AI Agent Orchestrator:
+# Target Environment Base URLs
+URL_TEST=[https://test.example.com](https://test.example.com)
+URL_PREPROD=[https://preprod.example.com](https://preprod.example.com)
+URL_PROD=[https://prod.example.com](https://prod.example.com)
+🏃‍♂️ Usage
+Run the AI Agent Orchestrator:
 
 Bash
 python agent.py
-🧠 Workflow
-Model Selection: Agent identifies the optimal Gemini model for analysis.
+🧠 How It Works
+The agent dynamically finds the most capable and available Gemini Flash model.
 
-Execution: Tests run sequentially across defined environments.
+It iterates through the configured environments (test, pre-prod, prod).
 
-Analysis: Failed tests are sent to the AI for RCA and severity scoring.
+It retrieves the list of tests from Playwright and runs them one by one.
 
-Reporting: All data is streamed to Grafana for real-time monitoring.
+For each test, the agent analyzes the JSON output. If a test fails due to flaky conditions, it triggers a retry.
 
-📄 License
-Personal project for advanced QA automation research.
+Results are immediately pushed to Grafana with an AI-generated RCA, severity score, and failure scope.
+
+After all environments are tested, a cross-environment summary is generated and pushed.
