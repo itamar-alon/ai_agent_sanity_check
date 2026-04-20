@@ -5,6 +5,8 @@ import json
 import time
 import glob
 import re
+import logging
+import sys
 from collections import defaultdict
 from dotenv import load_dotenv
 import threading
@@ -28,6 +30,15 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 os.makedirs("playwright/.auth", exist_ok=True)
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("agent_debug.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # ─────────────────────────────────────────────
 # State
@@ -62,30 +73,40 @@ def get_ctx() -> RunContext:
 # Playwright helpers
 # ─────────────────────────────────────────────
 
+
 def _run_playwright(grep_pattern: str = None, timeout: int = 400) -> dict:
     env = os.environ.copy()
     env["BASE_URL"] = CTX.base_url
-
+    
+    # שימוש ב-exact match כדי לא להריץ טסטים דומים בטעות
     cmd = "npx playwright test --reporter=json"
     if grep_pattern:
-        cmd += f' --grep "{grep_pattern}"'
+        cmd += f' --grep "^{re.escape(grep_pattern)}$"'
 
-    result = subprocess.run(
-        cmd, capture_output=True, text=True, shell=True,
-        encoding="utf-8", errors="replace", env=env, timeout=timeout
-    )
-
-    json_start = result.stdout.find("{")
-    if json_start == -1:
-        return {}
     try:
+        logger.info(f"🎭 Running Playwright: {grep_pattern if grep_pattern else 'Full Suite'}")
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, shell=True,
+            encoding="utf-8", errors="replace", env=env, timeout=timeout
+        )
+        
+        json_start = result.stdout.find("{")
+        if json_start == -1:
+            logger.error("❌ Playwright output is not a valid JSON")
+            return {}
+            
         return json.loads(result.stdout[json_start:])
-    except Exception:
+    except subprocess.TimeoutExpired:
+        logger.error(f"⏱️ Playwright timed out after {timeout}s")
+        return {}
+    except Exception as e:
+        logger.error(f"💥 Unexpected error in Playwright: {e}")
         return {}
 
 
 def _parse_results(data: dict) -> list[dict]:
     results = []
+    error_cache = {} 
     
     for suite in data.get("suites", []):
         for spec in suite.get("specs", []):
@@ -93,7 +114,7 @@ def _parse_results(data: dict) -> list[dict]:
             if not spec.get("tests"):
                 continue
             
-            last   = spec["tests"][0]["results"][-1]
+            last = spec["tests"][0]["results"][-1]
             status = last.get("status", "unknown")
             passed = status in ("expected", "passed")
             
@@ -110,23 +131,29 @@ def _parse_results(data: dict) -> list[dict]:
 
             if not passed:
                 res["severity"] = 1
-                print(f"🔍 [AI Analysis] Analyzing failure for: {test_name}...")
                 
-                prompt = f"Identify the root cause of this failure in 10 words or less: {error_msg}"
-                
-                try:
-                    response = client.models.generate_content(
-                        model="gemini-1.5-flash",
-                        contents=prompt
-                    )
-                    
-                    res["rca"] = response.text.strip()
-                    
-                except Exception as e:
-                    print(f"❌ AI Error: {e}")
-                    res["rca"] = "AI Analysis failed"
-                
-                time.sleep(1)
+                if error_msg in error_cache:
+                    logger.info(f"♻️ Using cached RCA for: {test_name}")
+                    res["rca"] = error_cache[error_msg]
+                else:
+                    logger.info(f"🔍 Analyzing new failure type for: {test_name}...")
+                    try:
+                        prompt = f"Identify the root cause of this failure in 10 words or less: {error_msg}"
+                        response = client.models.generate_content(
+                            model="gemini-1.5-flash",
+                            contents=prompt
+                        )
+                        
+                        if response and hasattr(response, 'text') and response.text:
+                            rca_result = response.text.strip()
+                            error_cache[error_msg] = rca_result # שומרים ב-Cache
+                            res["rca"] = rca_result
+                        else:
+                            res["rca"] = "AI returned empty response"
+                            
+                    except Exception as e:
+                        logger.error(f"❌ AI Error: {e}")
+                        res["rca"] = "AI Analysis failed"
 
             results.append(res)
             
@@ -302,31 +329,6 @@ def find_working_model() -> str:
             
     print("\n❌ Error: All available models are currently rate-limited or unavailable. Please wait a few minutes for the quota to reset.")
     exit()
-# ─────────────────────────────────────────────
-# Playwright helpers - UPDATED
-# ─────────────────────────────────────────────
-
-def _run_playwright(grep_pattern: str = None, timeout: int = 400) -> dict:
-    env = os.environ.copy()
-    env["BASE_URL"] = CTX.base_url
-
-    cmd = "npx playwright test --reporter=json"
-    if grep_pattern:
-        exact_pattern = f"^{grep_pattern}$"
-        cmd += f' --grep "{exact_pattern}"'
-
-    result = subprocess.run(
-        cmd, capture_output=True, text=True, shell=True,
-        encoding="utf-8", errors="replace", env=env, timeout=timeout
-    )
-
-    json_start = result.stdout.find("{")
-    if json_start == -1:
-        return {}
-    try:
-        return json.loads(result.stdout[json_start:])
-    except Exception:
-        return {}
 
 # ─────────────────────────────────────────────
 # System prompt - UPDATED FOR MEMORY
@@ -444,9 +446,12 @@ def send_with_fallback(chat_session, message, ctx: RunContext):
 # ─────────────────────────────────────────────
 
 def run_agent_for_env(ctx: RunContext) -> dict:
-    global CTX         
+    global CTX          
     CTX = ctx
     thread_local.ctx = ctx
+    
+    logger.info(f"🌐 Starting analysis for environment: {ctx.env_name}")
+    
     chat = client.chats.create(
         model=ctx.current_model, 
         config=types.GenerateContentConfig(
@@ -462,12 +467,26 @@ def run_agent_for_env(ctx: RunContext) -> dict:
         turn += 1
         parts = []
         for call in response.function_calls:
+            logger.info(f"🛠️ AI requested tool: {call.name}")
             result = TOOL_MAP[call.name](**dict(call.args))
             parts.append(types.Part.from_function_response(name=call.name, response={"result": result}))
         
         response, chat = send_with_fallback(chat, parts, ctx)
     
-    return _extract_json(response.text) if response.text else {}
+    if response and hasattr(response, 'text') and response.text:
+        extracted = _extract_json(response.text)
+        if extracted:
+            logger.info(f"✅ Successfully extracted summary for {ctx.env_name}")
+            return extracted
+    
+    logger.warning(f"⚠️ Failed to get a valid AI response for {ctx.env_name}. Falling back to empty summary.")
+    return {
+        "env": ctx.env_name,
+        "status": "AI_FAILURE",
+        "critical_tests": [],
+        "infra_suspected": False
+    }
+
 
 def get_working_models() -> list[str]:
     print("🔎 Checking priority models based on your availability...")

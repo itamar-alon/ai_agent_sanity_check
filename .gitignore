@@ -12,3 +12,4 @@ node_modules/
 *.png
 playwright-report
 *.bat
+agent_debug.log
