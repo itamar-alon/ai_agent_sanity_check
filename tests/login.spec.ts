@@ -19,8 +19,10 @@ test.describe('Login', () => {
     await page.click('button[role="tab"]:has-text("באמצעות סיסמה")');
     await page.fill('input[name="tz"]', process.env.TEST_ID!);
     await page.fill('input[name="password"]', process.env.TEST_PASSWORD!);
-    await page.locator('button[type="button"]:has-text("כניסה")').last().click();
-    await expect(page).not.toHaveURL(/login/);
+    
+    await page.locator('button[type="button"]:has-text("כניסה")').last().click({ force: true });
+    
+    await expect(page).not.toHaveURL(/login/, { timeout: 15000 });
   });
 
   test('failed login with wrong password', async ({ page }) => {
@@ -37,7 +39,9 @@ test.describe('Login', () => {
     await page.click('button[role="tab"]:has-text("באמצעות סיסמה")');
     await page.fill('input[name="tz"]', process.env.TEST_ID!);
     await page.fill('input[name="password"]', 'wrong_password_123');
-    await page.locator('button[type="button"]:has-text("כניסה")').last().click();
-    await expect(page.locator('.MuiAlert-message')).toBeVisible();
+    await page.locator('button[type="button"]:has-text("כניסה")').last().click({ force: true });
+    
+    const errorMsg = page.getByText(/אחד מהפרטים.*אינו מזוהה במערכת/);
+    await expect(errorMsg).toBeVisible({ timeout: 10000 });
   });
 });

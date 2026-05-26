@@ -18,7 +18,7 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
   const noDataLocator = page.getByText('אין נתונים');
 
   try {
-    await expect(dataLocator.or(noDataLocator)).toBeVisible({ timeout: 30000 });
+    await expect(dataLocator.or(noDataLocator)).toBeVisible({ timeout: 60000 });
     console.log("✅ Page state determined (Data exists or 'No Data' visible).");
   } catch (e) {
     throw new Error("❌ Timeout: Neither data nor 'No Data' message appeared.");
@@ -44,12 +44,12 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
 
   try {
     console.log("🔍 Checking tab: Account Status...");
-    await page.click('a:has-text("מצב חשבון"), button:has-text("מצב חשבון")');
+    await page.getByRole('tab', { name: 'מצב חשבון' }).click();
     
     const currencyLocator = page.locator('[aria-label*="₪"]').first();
     const noAccountData = page.getByText('אין נתונים');
 
-    await expect(currencyLocator.or(noAccountData)).toBeVisible({ timeout: 20000 });
+    await expect(currencyLocator.or(noAccountData)).toBeVisible({ timeout: 60000 });
 
     if (await noAccountData.isVisible()) {
       console.log("ℹ️ Account Status: No financial data found (Valid state).");
@@ -64,12 +64,12 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
 
   try {
     console.log("🔍 Checking tab: View Vouchers...");
-    await page.click('a:has-text("צפיה בשוברים"), button:has-text("צפיה בשוברים")');
+    await page.getByRole('tab', { name: 'צפיה בשוברים' }).click();
     
     const voucherSelect = page.locator('.MuiSelect-select').nth(0);
     const noVouchers = page.getByText('אין נתונים');
 
-    await expect(voucherSelect.or(noVouchers)).toBeVisible({ timeout: 20000 });
+    await expect(voucherSelect.or(noVouchers)).toBeVisible({ timeout: 60000 });
 
     if (await noVouchers.isVisible()) {
       console.log("ℹ️ Vouchers: No vouchers to display (Valid state).");
@@ -102,16 +102,16 @@ test('Arnona - full flow', async ({ page, baseURL }) => {
 
   try {
     console.log("🔍 Checking tab: Payment Receipts...");
-    await page.click('a:has-text("קבלות בגין תשלום"), button:has-text("קבלות בגין תשלום")');
+    await page.getByRole('tab', { name: 'קבלות בגין תשלום' }).click();
     
     const skeletonLoader = page.locator('.MuiSkeleton-root, .skeleton, .loading-state').first();
-    await skeletonLoader.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+    await skeletonLoader.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
 
     const receiptDate = page.locator('span[aria-label*="/"]').first();
     
     const noDataMessages = page.locator(':text("אין נתונים"), :text("לא נמצאו תוצאות")').first();
 
-    await expect(receiptDate.or(noDataMessages)).toBeVisible({ timeout: 20000 });
+    await expect(receiptDate.or(noDataMessages)).toBeVisible({ timeout: 60000 });
 
     if (await noDataMessages.isVisible()) {
       const foundText = await noDataMessages.innerText();

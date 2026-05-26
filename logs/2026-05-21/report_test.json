@@ -1,0 +1,886 @@
+{
+  "config": {
+    "configFile": "C:\\Rizone\\Projects\\sanity-check\\playwright.config.ts",
+    "rootDir": "C:/Rizone/Projects/sanity-check/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Rizone/Projects/sanity-check/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "C:/Rizone/Projects/sanity-check/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.setup.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Rizone/Projects/sanity-check/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Rizone/Projects/sanity-check/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "auth.setup.ts",
+      "file": "auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 22677,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🔐 Starting Global Authentication on: https://mytest.rishonlezion.muni.il\n"
+                    },
+                    {
+                      "text": "🔍 Checking for Cookie Banner...\n"
+                    },
+                    {
+                      "text": "✅ Cookies accepted.\n"
+                    },
+                    {
+                      "text": "⌨️ Filling credentials...\n"
+                    },
+                    {
+                      "text": "⏳ Submitting and waiting for login to complete...\n"
+                    },
+                    {
+                      "text": "✅ Authentication successful! Storage state saved to: playwright/.auth/user.json\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-21T15:00:35.154Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "17e3fe6f4d9d8bd79c6b-60f085b113a677673906",
+          "file": "auth.setup.ts",
+          "line": 5,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "arnona.spec.ts",
+      "file": "arnona.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Arnona - full flow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 150000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 80519,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Arnona on: https://mytest.rishonlezion.muni.il\n"
+                    },
+                    {
+                      "text": "⏳ Waiting for data or 'No Data' message...\n"
+                    },
+                    {
+                      "text": "✅ Page state determined (Data exists or 'No Data' visible).\n"
+                    },
+                    {
+                      "text": "🔍 Checking tab: Assets...\n"
+                    },
+                    {
+                      "text": "✅ Assets tab verified with data.\n"
+                    },
+                    {
+                      "text": "🔍 Checking tab: Account Status...\n"
+                    },
+                    {
+                      "text": "✅ Account Status verified with financial data.\n"
+                    },
+                    {
+                      "text": "🔍 Checking tab: View Vouchers...\n"
+                    },
+                    {
+                      "text": "⏳ Attempting to view/download voucher...\n"
+                    },
+                    {
+                      "text": "⚠️ Could not trigger download/tab, but voucher button exists.\n"
+                    },
+                    {
+                      "text": "🔍 Checking tab: Payment Receipts...\n"
+                    },
+                    {
+                      "text": "✅ Receipts data verified.\n"
+                    },
+                    {
+                      "text": "🎉 All Arnona tabs verified successfully!\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-21T15:01:05.952Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5305ab17f7d541478f14-6a9fbd62f1ba0766576f",
+          "file": "arnona.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "education.spec.ts",
+      "file": "education.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Education - full flow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14468,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Education on: https://mytest.rishonlezion.muni.il\n"
+                    },
+                    {
+                      "text": "🔍 Checking tab: Student Payments...\n"
+                    },
+                    {
+                      "text": "ℹ️ Student Payments: No payment link available (either no debt or no data).\n"
+                    },
+                    {
+                      "text": "🔍 Checking tab: Additional Payments...\n"
+                    },
+                    {
+                      "text": "ℹ️ Additional Payments: No payment link available (either no debt or no data).\n"
+                    },
+                    {
+                      "text": "🔍 Checking tab: Registration and Placement...\n"
+                    },
+                    {
+                      "text": "✅ Registration data found.\n"
+                    },
+                    {
+                      "text": "🎉 Education Sanity completed successfully!\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-21T15:02:26.944Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "39b52b7f0d711e381bdf-966c6cb4e826db5f96a6",
+          "file": "education.spec.ts",
+          "line": 48,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "login.spec.ts",
+      "file": "login.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Login",
+          "file": "login.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "successful login with valid credentials",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11614,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-21T15:02:41.479Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "41d3fd2474a19feb00a1-2ff2ce8092715c339cbf",
+              "file": "login.spec.ts",
+              "line": 8,
+              "column": 7
+            },
+            {
+              "title": "failed login with wrong password",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13689,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-21T15:02:53.143Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "41d3fd2474a19feb00a1-0de88d7b0ca31485b817",
+              "file": "login.spec.ts",
+              "line": 28,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "meeting.spec.ts",
+      "file": "meeting.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Appointments - full flow with natural navigation and Mock",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 250000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 165374,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Appointments on: https://mytest.rishonlezion.muni.il\n"
+                    },
+                    {
+                      "text": "Navigating to Appointments wizard (Attempt 1/3)...\n"
+                    },
+                    {
+                      "text": "Selecting option for Step 1...\n"
+                    },
+                    {
+                      "text": "Selecting option for Step 2...\n"
+                    },
+                    {
+                      "text": "Selecting option for Step 3...\n"
+                    },
+                    {
+                      "text": "Handling dynamic dates and times...\n"
+                    },
+                    {
+                      "text": "🔍 Found 7 available dates in current month.\n"
+                    },
+                    {
+                      "text": "🗓️ Clicking date #1 of 7...\n"
+                    },
+                    {
+                      "text": "ℹ️ Date #1 has no times available.\n"
+                    },
+                    {
+                      "text": "🔙 Clicking 'Back' to return to the calendar view...\n"
+                    },
+                    {
+                      "text": "Moving to the next available date...\n"
+                    },
+                    {
+                      "text": "🗓️ Clicking date #2 of 7...\n"
+                    },
+                    {
+                      "text": "ℹ️ Date #2 has no times available.\n"
+                    },
+                    {
+                      "text": "🔙 Clicking 'Back' to return to the calendar view...\n"
+                    },
+                    {
+                      "text": "Moving to the next available date...\n"
+                    },
+                    {
+                      "text": "🗓️ Clicking date #3 of 7...\n"
+                    },
+                    {
+                      "text": "ℹ️ Date #3 has no times available.\n"
+                    },
+                    {
+                      "text": "🔙 Clicking 'Back' to return to the calendar view...\n"
+                    },
+                    {
+                      "text": "Moving to the next available date...\n"
+                    },
+                    {
+                      "text": "🗓️ Clicking date #4 of 7...\n"
+                    },
+                    {
+                      "text": "✅ Found 18 visible time slots! Selecting the first one...\n"
+                    },
+                    {
+                      "text": "Submitting appointment request...\n"
+                    },
+                    {
+                      "text": "🛡️ INITIATING MOCK: Intercepted real appointment request!\n"
+                    },
+                    {
+                      "text": "✅ MOCK SUCCESS: Injected fake confirmation response.\n"
+                    },
+                    {
+                      "text": "Verifying success message...\n"
+                    },
+                    {
+                      "text": "🎉 Appointment flow completed successfully (Mocked).\n"
+                    },
+                    {
+                      "text": "✅ Sanity completed!\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-21T15:03:06.890Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e3edbeebe5c900494fe7-e3a2c39a5c0230dcb8d7",
+          "file": "meeting.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "myInquiries.spec.ts",
+      "file": "myInquiries.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "My Inquiries - data visibility check",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 34364,
+                  "error": {
+                    "message": "Error: My Inquiries test failed: Inquiries Data Visibility",
+                    "stack": "Error: My Inquiries test failed: Inquiries Data Visibility\n    at C:\\Rizone\\Projects\\sanity-check\\tests\\myInquiries.spec.ts:58:11",
+                    "location": {
+                      "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\myInquiries.spec.ts",
+                      "column": 11,
+                      "line": 58
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 56 |\u001b[39m\n \u001b[90m 57 |\u001b[39m   \u001b[36mif\u001b[39m (hasErrors) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 58 |\u001b[39m     \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`My Inquiries test failed: ${errorSummary.join(', ')}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 59 |\u001b[39m   } \u001b[36melse\u001b[39m {\n \u001b[90m 60 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m\"🎉 My Inquiries verification completed successfully!\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 61 |\u001b[39m   }\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\myInquiries.spec.ts",
+                        "column": 11,
+                        "line": 58
+                      },
+                      "message": "Error: My Inquiries test failed: Inquiries Data Visibility\n\n\u001b[0m \u001b[90m 56 |\u001b[39m\n \u001b[90m 57 |\u001b[39m   \u001b[36mif\u001b[39m (hasErrors) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 58 |\u001b[39m     \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`My Inquiries test failed: ${errorSummary.join(', ')}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 59 |\u001b[39m   } \u001b[36melse\u001b[39m {\n \u001b[90m 60 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m\"🎉 My Inquiries verification completed successfully!\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 61 |\u001b[39m   }\u001b[0m\n\u001b[2m    at C:\\Rizone\\Projects\\sanity-check\\tests\\myInquiries.spec.ts:58:11\u001b[22m"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - My Inquiries on: https://mytest.rishonlezion.muni.il\n"
+                    },
+                    {
+                      "text": "Navigating to My Inquiries via UI...\n"
+                    }
+                  ],
+                  "stderr": [
+                    {
+                      "text": "❌ Error in My Inquiries flow: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/פניותיי|הפניות שלי|מעקב פניות/).first()\u001b[22m\n\u001b[2m    - locator resolved to <span class=\"text-center text-[1.1rem] leading-[1.1] h-[35px] w-[85px]\">הפניות שלי</span>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - performing click action\u001b[22m\n\u001b[2m    - click action done\u001b[22m\n\u001b[2m    - waiting for scheduled navigations to finish\u001b[22m\n\n"
+                    }
+                  ],
+                  "retry": 0,
+                  "startTime": "2026-05-21T15:05:52.529Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\myInquiries-My-Inquiries---data-visibility-check-chromium\\video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\myInquiries-My-Inquiries---data-visibility-check-chromium\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\myInquiries-My-Inquiries---data-visibility-check-chromium\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\myInquiries.spec.ts",
+                    "column": 11,
+                    "line": 58
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "488624da49f96c9fd918-ccc58962200d871de3e1",
+          "file": "myInquiries.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "newInquire.spec.ts",
+      "file": "newInquire.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Create All Inquiries - Single Session with Reset Logic",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 75375,
+                  "error": {
+                    "message": "Error: Create Inquiries test failed in: Field Treatment (106), Information Request",
+                    "stack": "Error: Create Inquiries test failed in: Field Treatment (106), Information Request\n    at C:\\Rizone\\Projects\\sanity-check\\tests\\newInquire.spec.ts:150:11",
+                    "location": {
+                      "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\newInquire.spec.ts",
+                      "column": 11,
+                      "line": 150
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 148 |\u001b[39m   \n \u001b[90m 149 |\u001b[39m   \u001b[36mif\u001b[39m (hasErrors) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 150 |\u001b[39m     \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Create Inquiries test failed in: ${errorSummary.join(', ')}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 151 |\u001b[39m   } \u001b[36melse\u001b[39m {\n \u001b[90m 152 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m\"\\n🏁 Integrated Sanity Run Finished Successfully.\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 153 |\u001b[39m   }\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\newInquire.spec.ts",
+                        "column": 11,
+                        "line": 150
+                      },
+                      "message": "Error: Create Inquiries test failed in: Field Treatment (106), Information Request\n\n\u001b[0m \u001b[90m 148 |\u001b[39m   \n \u001b[90m 149 |\u001b[39m   \u001b[36mif\u001b[39m (hasErrors) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 150 |\u001b[39m     \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Create Inquiries test failed in: ${errorSummary.join(', ')}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 151 |\u001b[39m   } \u001b[36melse\u001b[39m {\n \u001b[90m 152 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m\"\\n🏁 Integrated Sanity Run Finished Successfully.\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 153 |\u001b[39m   }\u001b[0m\n\u001b[2m    at C:\\Rizone\\Projects\\sanity-check\\tests\\newInquire.spec.ts:150:11\u001b[22m"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Integrated Sanity Run - New Inquiries on: https://mytest.rishonlezion.muni.il\n"
+                    },
+                    {
+                      "text": "\n--- Processing: Field Treatment (106) ---\n"
+                    },
+                    {
+                      "text": "Navigating to Create Inquiry via UI...\n"
+                    },
+                    {
+                      "text": "❌ Error in Field Treatment (106): locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/פניה חדשה|יצירת פניה|פתיחת קריאה|מוקד 106/).first()\u001b[22m\n\n"
+                    },
+                    {
+                      "text": "\n--- Processing: Information Request ---\n"
+                    },
+                    {
+                      "text": "Navigating to Create Inquiry via UI...\n"
+                    },
+                    {
+                      "text": "❌ Error in Information Request: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText(/פניה חדשה|יצירת פניה|פתיחת קריאה|מוקד 106/).first()\u001b[22m\n\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-21T15:06:39.070Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\newInquire-Create-All-Inqu-b4492-le-Session-with-Reset-Logic-chromium\\test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\newInquire-Create-All-Inqu-b4492-le-Session-with-Reset-Logic-chromium\\video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\newInquire-Create-All-Inqu-b4492-le-Session-with-Reset-Logic-chromium\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\newInquire-Create-All-Inqu-b4492-le-Session-with-Reset-Logic-chromium\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\newInquire.spec.ts",
+                    "column": 11,
+                    "line": 150
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "8ece93c5e98e921f9b9a-31eeaf5257c52a69706c",
+          "file": "newInquire.spec.ts",
+          "line": 14,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "parking.spec.ts",
+      "file": "parking.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Parking - full flow",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 39271,
+                  "error": {
+                    "message": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('חניה/ תו חניה').first()\u001b[22m\n",
+                    "stack": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('חניה/ תו חניה').first()\u001b[22m\n\n    at C:\\Rizone\\Projects\\sanity-check\\tests\\parking.spec.ts:22:21",
+                    "location": {
+                      "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\parking.spec.ts",
+                      "column": 21,
+                      "line": 22
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 20 |\u001b[39m   console\u001b[33m.\u001b[39mlog(\u001b[32m\"🖱️ Clicking on 'Parking' tile from Homepage...\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m   \u001b[36mconst\u001b[39m parkingTile \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByText(\u001b[32m'חניה/ תו חניה'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 22 |\u001b[39m   \u001b[36mawait\u001b[39m parkingTile\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m   console\u001b[33m.\u001b[39mlog(\u001b[32m\"🖱️ Switching to tab: 'דו\\\"חות חניה - מידע אישי'...\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 25 |\u001b[39m   \u001b[36mconst\u001b[39m ticketsTab \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button, a, span'\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[32m'דו\"חות חניה - מידע אישי'\u001b[39m })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\parking.spec.ts",
+                        "column": 21,
+                        "line": 22
+                      },
+                      "message": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('חניה/ תו חניה').first()\u001b[22m\n\n\n\u001b[0m \u001b[90m 20 |\u001b[39m   console\u001b[33m.\u001b[39mlog(\u001b[32m\"🖱️ Clicking on 'Parking' tile from Homepage...\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m   \u001b[36mconst\u001b[39m parkingTile \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByText(\u001b[32m'חניה/ תו חניה'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 22 |\u001b[39m   \u001b[36mawait\u001b[39m parkingTile\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m   console\u001b[33m.\u001b[39mlog(\u001b[32m\"🖱️ Switching to tab: 'דו\\\"חות חניה - מידע אישי'...\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 25 |\u001b[39m   \u001b[36mconst\u001b[39m ticketsTab \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button, a, span'\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m \u001b[32m'דו\"חות חניה - מידע אישי'\u001b[39m })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Rizone\\Projects\\sanity-check\\tests\\parking.spec.ts:22:21\u001b[22m"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Parking via UI Navigation on: https://mytest.rishonlezion.muni.il\n"
+                    },
+                    {
+                      "text": "🖱️ Clicking on 'Parking' tile from Homepage...\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-21T15:07:59.489Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\parking-Parking---full-flow-chromium\\test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\parking-Parking---full-flow-chromium\\video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\parking-Parking---full-flow-chromium\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\parking-Parking---full-flow-chromium\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\parking.spec.ts",
+                    "column": 21,
+                    "line": 22
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b9210aa08a9e80ab183c-5c51bb80f8ae6a6efac7",
+          "file": "parking.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "street.spec.ts",
+      "file": "street.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Street Info - dynamic check",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 66333,
+                  "error": {
+                    "message": "Error: Street Info test failed: Street Data Visibility",
+                    "stack": "Error: Street Info test failed: Street Data Visibility\n    at C:\\Rizone\\Projects\\sanity-check\\tests\\street.spec.ts:52:11",
+                    "location": {
+                      "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\street.spec.ts",
+                      "column": 11,
+                      "line": 52
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 50 |\u001b[39m\n \u001b[90m 51 |\u001b[39m   \u001b[36mif\u001b[39m (hasErrors) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 52 |\u001b[39m     \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Street Info test failed: ${errorSummary.join(', ')}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 53 |\u001b[39m   } \u001b[36melse\u001b[39m {\n \u001b[90m 54 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m\"🎉 Street Info verification completed!\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m   }\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\street.spec.ts",
+                        "column": 11,
+                        "line": 52
+                      },
+                      "message": "Error: Street Info test failed: Street Data Visibility\n\n\u001b[0m \u001b[90m 50 |\u001b[39m\n \u001b[90m 51 |\u001b[39m   \u001b[36mif\u001b[39m (hasErrors) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 52 |\u001b[39m     \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Street Info test failed: ${errorSummary.join(', ')}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 53 |\u001b[39m   } \u001b[36melse\u001b[39m {\n \u001b[90m 54 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m\"🎉 Street Info verification completed!\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m   }\u001b[0m\n\u001b[2m    at C:\\Rizone\\Projects\\sanity-check\\tests\\street.spec.ts:52:11\u001b[22m"
+                    },
+                    {
+                      "message": "Error: apiRequestContext._wrapApiCall: ENOENT: no such file or directory, open 'C:\\Rizone\\Projects\\sanity-check\\test-results\\.playwright-artifacts-4\\traces\\793f901dfe63fbe0e071-14de177230012620560e.network'"
+                    },
+                    {
+                      "message": "Error: ENOENT: no such file or directory, open 'C:\\Rizone\\Projects\\sanity-check\\test-results\\.playwright-artifacts-4\\ffecc141e9eb5a3baef7fd0c0d5a609c.zip'"
+                    },
+                    {
+                      "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "🚀 Starting Sanity Run - Street Info\n"
+                    },
+                    {
+                      "text": "Selecting a street from the dropdown...\n"
+                    },
+                    {
+                      "text": "❌ Error in Street Info flow: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[role=\"combobox\"]')\u001b[22m\n\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-21T15:08:42.169Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Rizone\\Projects\\sanity-check\\test-results\\street-Street-Info---dynamic-check-chromium\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Rizone\\Projects\\sanity-check\\tests\\street.spec.ts",
+                    "column": 11,
+                    "line": 52
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "793f901dfe63fbe0e071-14de177230012620560e",
+          "file": "street.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-21T15:00:31.618Z",
+    "duration": 620416.198,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 4,
+    "flaky": 0
+  }
+}
